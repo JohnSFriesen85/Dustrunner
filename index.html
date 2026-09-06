@@ -218,7 +218,7 @@ body{
   margin-top:14px;
 }
 .add-title{ font-size:9px; color:var(--dim); letter-spacing:.1em; margin-bottom:10px; }
-.add-grid{ display:grid; grid-template-columns:1fr 90px; gap:6px; margin-bottom:6px; }
+.add-grid{ display:grid; grid-template-columns:1fr 70px 90px; gap:6px; margin-bottom:6px; }
 .add-grid2{ display:grid; grid-template-columns:1fr 1fr 80px; gap:6px; margin-bottom:8px; }
 .field-label{ font-size:8px; color:var(--dim); margin-bottom:2px; letter-spacing:.06em; }
 .field-input{
@@ -360,6 +360,10 @@ body{
           <input class="field-input" id="fName" placeholder="Item name or description…" onkeydown="if(event.key==='Enter')addItem()">
         </div>
         <div>
+          <div class="field-label">Qty</div>
+          <input class="field-input" id="fQty" type="number" min="1" placeholder="1" onkeydown="if(event.key==='Enter')addItem()">
+        </div>
+        <div>
           <div class="field-label">Value (cr)</div>
           <input class="field-input" id="fValue" type="number" min="0" placeholder="0" onkeydown="if(event.key==='Enter')addItem()">
         </div>
@@ -446,6 +450,14 @@ function itemsForTab(tab){
 // ── Format ────────────────────────────────────────────────────────────────────
 function fmt(n){ return Math.round(n).toLocaleString('en-US')+' cr'; }
 
+// ── Quantity helpers ──────────────────────────────────────────────────────────
+function itemQty(item){ return item.qty && item.qty > 1 ? item.qty : 1; }
+function itemTotal(item){ return item.value * itemQty(item); }
+function displayName(item){
+  const q = itemQty(item);
+  return q > 1 ? `${item.name} ×${q}` : item.name;
+}
+
 // ── Render content ────────────────────────────────────────────────────────────
 function renderContent(){
   const tab = STATE.activeTab;
@@ -464,7 +476,7 @@ function renderContent(){
     groups[i.session].push(i);
   });
 
-  const total = items.reduce((s,i) => s + i.value, 0);
+  const total = items.reduce((s,i) => s + itemTotal(i), 0);
 
   let html = `<div class="section-hdr">
     <span class="section-title">${tab==='All'?'All Acquired Items':tab+' — Assigned Items'}</span>
@@ -481,11 +493,11 @@ function renderContent(){
     sitems.forEach(item => {
       html += `<div class="item-row">
         <div>
-          <div class="item-name">${esc(item.name)}</div>
+          <div class="item-name">${esc(displayName(item))}</div>
           <div class="item-session">${esc(item.recipient)}</div>
         </div>
         <div style="text-align:right">
-          <div class="item-val">${fmt(item.value)}</div>
+          <div class="item-val">${fmt(itemTotal(item))}</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <span class="item-tag kept">Kept</span>
@@ -500,7 +512,7 @@ function renderContent(){
 
 function renderSell(el){
   const items = STATE.items.filter(i=>i.status==='sell');
-  const rawTotal = items.reduce((s,i)=>s+i.value,0);
+  const rawTotal = items.reduce((s,i)=>s+itemTotal(i),0);
   const estTotal = rawTotal*0.1;
 
   let html = `<div class="section-hdr">
@@ -516,9 +528,9 @@ function renderSell(el){
   html += '<div class="sell-bucket">';
   items.forEach(item => {
     html += `<div class="sell-row">
-      <span class="sell-name">${esc(item.name)}</span>
+      <span class="sell-name">${esc(displayName(item))}</span>
       <span style="color:var(--dim);font-size:9px;margin-right:8px">${esc(item.session)}</span>
-      <span class="sell-est">${fmt(item.value*0.1)}</span>
+      <span class="sell-est">${fmt(itemTotal(item)*0.1)}</span>
       <button onclick="deleteItem(${item.id})" style="background:none;border:none;color:var(--dim);font-family:var(--mono);font-size:12px;cursor:pointer;padding:0 4px;margin-left:4px">&times;</button>
     </div>`;
   });
@@ -533,14 +545,17 @@ function renderSell(el){
 // ── Add item ──────────────────────────────────────────────────────────────────
 function addItem(){
   const name      = document.getElementById('fName').value.trim();
+  const qtyRaw    = document.getElementById('fQty').value;
+  const qty       = qtyRaw.trim() === '' ? 1 : Math.max(1, parseInt(qtyRaw) || 1);
   const value     = parseFloat(document.getElementById('fValue').value)||0;
   const recipient = document.getElementById('fRecipient').value;
   const session   = document.getElementById('fSession').value.trim()||'Session 1';
   const status    = document.getElementById('fStatus').value;
   if(!name){ document.getElementById('fName').focus(); return; }
-  STATE.items.push({id:Date.now()+Math.random(), name, value, recipient, session, status});
+  STATE.items.push({id:Date.now()+Math.random(), name, qty, value, recipient, session, status});
   save();
   document.getElementById('fName').value='';
+  document.getElementById('fQty').value='';
   document.getElementById('fValue').value='';
   updateTimestamp();
   refresh();
@@ -571,9 +586,9 @@ function openShare(){
   CHARS.forEach(c => {
     const mine = STATE.items.filter(i=>i.status==='kept'&&(i.recipient===c||i.recipient==='Crew'));
     if(mine.length===0) return;
-    const total = mine.reduce((s,i)=>s+i.value,0);
+    const total = mine.reduce((s,i)=>s+itemTotal(i),0);
     lines.push('── '+c+' ──────────────────');
-    mine.forEach(i => lines.push('  '+i.name.padEnd(32,' ')+fmt(i.value)));
+    mine.forEach(i => lines.push('  '+displayName(i).padEnd(32,' ')+fmt(itemTotal(i))));
     lines.push('  Total: '+fmt(total));
     lines.push('');
   });
@@ -582,7 +597,7 @@ function openShare(){
   const shared = STATE.items.filter(i=>i.status==='kept'&&i.recipient==='Crew');
   if(shared.length>0){
     lines.push('── Crew (Shared) ──────────────');
-    shared.forEach(i=>lines.push('  '+i.name.padEnd(32,' ')+fmt(i.value)));
+    shared.forEach(i=>lines.push('  '+displayName(i).padEnd(32,' ')+fmt(itemTotal(i))));
     lines.push('');
   }
 
@@ -590,14 +605,14 @@ function openShare(){
   const sell = STATE.items.filter(i=>i.status==='sell');
   if(sell.length>0){
     lines.push('── To Sell ────────────────────');
-    sell.forEach(i=>lines.push('  '+i.name.padEnd(32,' ')+'~'+fmt(i.value*0.1)));
-    const est=sell.reduce((s,i)=>s+i.value*0.1,0);
+    sell.forEach(i=>lines.push('  '+displayName(i).padEnd(32,' ')+'~'+fmt(itemTotal(i)*0.1)));
+    const est=sell.reduce((s,i)=>s+itemTotal(i)*0.1,0);
     lines.push('  Estimated proceeds: '+fmt(est));
     lines.push('');
   }
 
   // Grand total kept
-  const allKept=STATE.items.filter(i=>i.status==='kept').reduce((s,i)=>s+i.value,0);
+  const allKept=STATE.items.filter(i=>i.status==='kept').reduce((s,i)=>s+itemTotal(i),0);
   lines.push('══════════════════════════════════');
   lines.push('Total kept value: '+fmt(allKept));
 
