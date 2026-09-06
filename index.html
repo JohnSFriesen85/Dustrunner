@@ -176,8 +176,29 @@ body{
 }
 .item-tag.kept{ border-color:var(--green); color:var(--green); background:#0c1a0a; }
 .item-tag.sell{ border-color:var(--tan-dim); color:var(--tan-dim); background:#1a1508; }
+.item-tag.unavailable{ border-color:var(--red); color:var(--red); background:#1f0a08; }
 
 .empty-msg{ text-align:center; padding:24px; font-size:10px; color:var(--dim); }
+
+/* ── Row action buttons ── */
+.act-btn{
+  background:none;
+  border:1px solid var(--border);
+  color:var(--dim);
+  font-family:var(--mono);
+  font-size:9px;
+  padding:2px 7px;
+  border-radius:2px;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:border-color .12s, color .12s;
+}
+.act-btn:hover{ border-color:var(--tan-dim); color:var(--tan-dim); }
+.del-btn{
+  background:none; border:none; color:var(--dim);
+  font-family:var(--mono); font-size:12px; cursor:pointer; padding:0 2px;
+}
+.del-btn:hover{ color:var(--red); }
 
 /* ── Sell bucket ── */
 .sell-bucket{
@@ -414,6 +435,18 @@ body{
   </div>
 </div>
 
+<!-- Transfer modal -->
+<div class="modal-overlay" id="transferModal" onclick="if(event.target===this)closeTransfer()">
+  <div class="modal">
+    <div class="modal-title">Transfer Item</div>
+    <div id="transferBody"></div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" onclick="confirmTransfer()">Transfer</button>
+      <button class="btn btn-ghost" onclick="closeTransfer()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── Data ────────────────────────────────────────────────────────────────────
 const CHARS = ['Rast','Grevakh','Cael','Lyra','Chungus'];
@@ -429,7 +462,7 @@ function save(){ localStorage.setItem('cw_manifest', JSON.stringify(STATE)); }
 // ── Tabs ─────────────────────────────────────────────────────────────────────
 function renderTabs(){
   const tabs = document.getElementById('tabs');
-  const options = ['All', ...CHARS, 'Sell'];
+  const options = ['All', ...CHARS, 'Sell', 'Unavailable'];
   tabs.innerHTML = '';
   options.forEach(t => {
     const btn = document.createElement('button');
@@ -444,6 +477,7 @@ function renderTabs(){
 function itemsForTab(tab){
   if(tab==='All') return STATE.items.filter(i=>i.status==='kept');
   if(tab==='Sell') return STATE.items.filter(i=>i.status==='sell');
+  if(tab==='Unavailable') return STATE.items.filter(i=>i.status==='unavailable');
   return STATE.items.filter(i=>i.status==='kept' && (i.recipient===tab || i.recipient==='Crew'));
 }
 
@@ -465,6 +499,9 @@ function renderContent(){
 
   if(tab==='Sell'){
     renderSell(el); return;
+  }
+  if(tab==='Unavailable'){
+    renderUnavailable(el); return;
   }
 
   const items = itemsForTab(tab);
@@ -501,7 +538,8 @@ function renderContent(){
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <span class="item-tag kept">Kept</span>
-          <button onclick="deleteItem(${item.id})" style="background:none;border:none;color:var(--dim);font-family:var(--mono);font-size:12px;cursor:pointer;padding:0 2px" title="Remove">&times;</button>
+          <button class="act-btn" onclick="openTransfer(${item.id})">Transfer</button>
+          <button class="del-btn" onclick="deleteItem(${item.id})" title="Remove">&times;</button>
         </div>
       </div>`;
     });
@@ -531,13 +569,43 @@ function renderSell(el){
       <span class="sell-name">${esc(displayName(item))}</span>
       <span style="color:var(--dim);font-size:9px;margin-right:8px">${esc(item.session)}</span>
       <span class="sell-est">${fmt(itemTotal(item)*0.1)}</span>
-      <button onclick="deleteItem(${item.id})" style="background:none;border:none;color:var(--dim);font-family:var(--mono);font-size:12px;cursor:pointer;padding:0 4px;margin-left:4px">&times;</button>
+      <button class="act-btn" style="margin-left:8px" onclick="openTransfer(${item.id})">Transfer</button>
+      <button class="del-btn" style="margin-left:4px" onclick="deleteItem(${item.id})">&times;</button>
     </div>`;
   });
   html += `<div class="sell-foot">
     <span class="sell-foot-label">Face value: ${fmt(rawTotal)} &nbsp;|&nbsp; Sell estimate (10%):</span>
     <span class="sell-foot-val">${fmt(estTotal)}</span>
   </div></div>`;
+
+  el.innerHTML = html;
+}
+
+function renderUnavailable(el){
+  const items = STATE.items.filter(i=>i.status==='unavailable');
+  const rawTotal = items.reduce((s,i)=>s+itemTotal(i),0);
+
+  let html = `<div class="section-hdr">
+    <span class="section-title">Unavailable (Lost / Destroyed / Given Away)</span>
+    <span class="section-total">${fmt(rawTotal)} face value</span>
+  </div>`;
+
+  if(items.length===0){
+    html += '<div class="empty-msg">Nothing here. Everything the crew has found is accounted for.</div>';
+    el.innerHTML=html; return;
+  }
+
+  html += '<div class="sell-bucket">';
+  items.forEach(item => {
+    html += `<div class="sell-row">
+      <span class="sell-name">${esc(displayName(item))}</span>
+      <span style="color:var(--dim);font-size:9px;margin-right:8px">${esc(item.session)}</span>
+      <span class="item-tag unavailable">Unavailable</span>
+      <button class="act-btn" style="margin-left:8px" onclick="openTransfer(${item.id})">Transfer</button>
+      <button class="del-btn" style="margin-left:4px" onclick="deleteItem(${item.id})">&times;</button>
+    </div>`;
+  });
+  html += '</div>';
 
   el.innerHTML = html;
 }
@@ -566,6 +634,91 @@ function addItem(){
 function deleteItem(id){
   STATE.items=STATE.items.filter(i=>i.id!==id);
   save(); refresh();
+}
+
+// ── Transfer ──────────────────────────────────────────────────────────────────
+let transferItemId = null;
+
+function statusLabel(item){
+  if(item.status==='sell') return 'Sell Pile';
+  if(item.status==='unavailable') return 'Unavailable';
+  return item.recipient;
+}
+
+function openTransfer(id){
+  const item = STATE.items.find(i=>i.id===id);
+  if(!item) return;
+  transferItemId = id;
+  const qty = itemQty(item);
+  const body = document.getElementById('transferBody');
+  const destOptions = ['Crew', ...CHARS]
+    .filter(c => !(item.status==='kept' && item.recipient===c))
+    .map(c => `<option value="${c}">${c==='Crew'?'Crew (shared)':c}</option>`).join('');
+  body.innerHTML = `
+    <div style="margin-bottom:12px;font-size:11px;color:var(--text)">
+      ${esc(displayName(item))} — currently with <span style="color:var(--tan)">${esc(statusLabel(item))}</span>
+    </div>
+    <div class="add-grid2" style="grid-template-columns:70px 1fr">
+      <div>
+        <div class="field-label">Qty to move</div>
+        <input class="field-input" id="tQty" type="number" min="1" max="${qty}" value="${qty}">
+      </div>
+      <div>
+        <div class="field-label">Send to</div>
+        <select class="field-select" id="tDest">
+          ${destOptions}
+          <option value="__sell"${item.status==='sell'?' disabled':''}>Sell Pile</option>
+          <option value="__unavailable"${item.status==='unavailable'?' disabled':''}>Destroy / Give Away / Lost</option>
+        </select>
+      </div>
+    </div>
+    <div style="font-size:9px;color:var(--dim);margin-top:8px">Moving fewer than the full stack splits it — the rest stays where it is.</div>
+  `;
+  document.getElementById('transferModal').classList.add('open');
+}
+
+function closeTransfer(){
+  document.getElementById('transferModal').classList.remove('open');
+  transferItemId = null;
+}
+
+function confirmTransfer(){
+  const item = STATE.items.find(i=>i.id===transferItemId);
+  if(!item) return closeTransfer();
+
+  const maxQty = itemQty(item);
+  let moveQty = parseInt(document.getElementById('tQty').value) || 1;
+  moveQty = Math.max(1, Math.min(maxQty, moveQty));
+  const dest = document.getElementById('tDest').value;
+
+  let newStatus = 'kept', newRecipient = item.recipient;
+  if(dest === '__sell'){ newStatus = 'sell'; }
+  else if(dest === '__unavailable'){ newStatus = 'unavailable'; }
+  else { newStatus = 'kept'; newRecipient = dest; }
+
+  if(moveQty >= maxQty){
+    // Move the whole stack in place — no split needed
+    item.status = newStatus;
+    item.recipient = newRecipient;
+    if(!item.qty) item.qty = 1;
+  } else {
+    // Split: shrink the original stack, create a new item for the moved portion
+    item.qty = maxQty - moveQty;
+    STATE.items.push({
+      id: Date.now() + Math.random(),
+      name: item.name,
+      qty: moveQty,
+      value: item.value,
+      recipient: newRecipient,
+      session: item.session,
+      status: newStatus,
+    });
+  }
+
+  save();
+  updateTimestamp();
+  closeTransfer();
+  refresh();
 }
 
 // ── Clear ─────────────────────────────────────────────────────────────────────
