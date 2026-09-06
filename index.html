@@ -1,4 +1,25 @@
 <!DOCTYPE html>
+<!--
+  DUSTRUNNER — CREW MANIFEST — CHANGELOG
+  (Kept here so future edits can pick up context without re-deriving history.)
+
+  v1 — Initial player-facing crew manifest tracker: tabs (All / per-character /
+       Sell), Log New Item form, plain-text Share Summary with copy-to-clipboard,
+       localStorage persistence.
+  v2 — Added Qty field to the log form. Items can be logged as stacks; displayed
+       value is unit value × quantity, name shows as "Item ×N" when N > 1.
+  v3 — Added Transfer: a button on every item row opens a modal to move an item
+       (or split part of a stack) to another character, the Sell pile, or a new
+       Unavailable status (lost / destroyed / given away). Added the Unavailable
+       tab.
+  v4 — Added "Download as .txt" for the Share Summary. Added Export Data /
+       Import Data (JSON) so the full manifest — not just the human-readable
+       summary — can be handed off between players or devices without losing
+       session-level detail.
+
+  Pending / ideas not yet built:
+  (none currently — add here as they come up)
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -292,6 +313,19 @@ body{
   transition:all .15s;
 }
 .btn-share:hover{ border-color:var(--tan); color:var(--tan); }
+.btn-util{
+  background:none;
+  border:1px solid var(--border);
+  color:var(--dim);
+  font-family:var(--mono);
+  font-size:10px;
+  padding:4px 10px;
+  border-radius:3px;
+  cursor:pointer;
+  transition:all .15s;
+}
+.btn-util:hover{ border-color:var(--tan-dim); color:var(--tan-dim); }
+.file-label{ display:inline-block; }
 
 /* ── Share modal ── */
 .modal-overlay{
@@ -358,7 +392,14 @@ body{
       </div>
       <div class="meta-item" style="margin-left:auto">
         <span class="meta-label">&nbsp;</span>
-        <button class="btn-share" onclick="openShare()">Share Summary</button>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="btn-util" onclick="exportData()" title="Download the full manifest as a data file">Export Data</button>
+          <label class="btn-util file-label" title="Load a manifest data file exported earlier">
+            Import Data
+            <input type="file" accept=".json,application/json" onchange="importData(event)" style="display:none">
+          </label>
+          <button class="btn-share" onclick="openShare()">Share Summary</button>
+        </div>
       </div>
     </div>
   </div>
@@ -429,6 +470,7 @@ body{
     <div class="modal-title">Crew Manifest — Share Summary</div>
     <div class="modal-text" id="shareText"></div>
     <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="downloadShareText()">Download .txt</button>
       <button class="btn btn-primary" onclick="copyShare()">Copy to Clipboard</button>
       <button class="btn btn-ghost" onclick="closeShare()">Close</button>
     </div>
@@ -769,20 +811,85 @@ function openShare(){
   lines.push('══════════════════════════════════');
   lines.push('Total kept value: '+fmt(allKept));
 
-  document.getElementById('shareText').textContent=lines.join('\n');
+  lastShareText = lines.join('\n');
+  document.getElementById('shareText').textContent=lastShareText;
   document.getElementById('modal').classList.add('open');
 }
+
+let lastShareText = '';
 
 function closeShare(){ document.getElementById('modal').classList.remove('open'); }
 
 function copyShare(){
   const text = document.getElementById('shareText').textContent;
   navigator.clipboard.writeText(text).then(()=>{
-    const btn = document.querySelector('.modal-btns .btn-primary');
+    const btn = document.querySelector('#modal .modal-btns .btn-primary');
     const orig = btn.textContent;
     btn.textContent='Copied!';
     setTimeout(()=>btn.textContent=orig, 1500);
   });
+}
+
+function downloadFile(filename, contents, mime){
+  const blob = new Blob([contents], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function dateStamp(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+function downloadShareText(){
+  downloadFile(`dustrunner-manifest-${dateStamp()}.txt`, lastShareText, 'text/plain');
+  const btn = document.querySelector('#modal .modal-btns .btn-ghost');
+  if(btn){
+    const orig = btn.textContent;
+    btn.textContent='Downloaded!';
+    setTimeout(()=>btn.textContent=orig, 1500);
+  }
+}
+
+// ── Export / Import full data ────────────────────────────────────────────────
+function exportData(){
+  const payload = {
+    exportedFrom: 'Dustrunner Crew Manifest',
+    exportedAt: new Date().toISOString(),
+    state: STATE,
+  };
+  downloadFile(`dustrunner-manifest-data-${dateStamp()}.json`, JSON.stringify(payload, null, 2), 'application/json');
+}
+
+function importData(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      const incoming = parsed && parsed.state ? parsed.state : parsed;
+      if(!incoming || !Array.isArray(incoming.items)){
+        alert('That file doesn\'t look like a Dustrunner manifest export.');
+        return;
+      }
+      if(!confirm(`Import this manifest? It contains ${incoming.items.length} item(s) and will replace what's currently loaded on this device.`)) return;
+      STATE = incoming;
+      save();
+      updateTimestamp();
+      refresh();
+    } catch(err){
+      alert('Could not read that file — make sure it\'s an unmodified manifest export.');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
 }
 
 // ── Timestamp ─────────────────────────────────────────────────────────────────
