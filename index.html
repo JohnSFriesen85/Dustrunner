@@ -16,9 +16,38 @@
        Import Data (JSON) so the full manifest — not just the human-readable
        summary — can be handed off between players or devices without losing
        session-level detail.
+  v5 — Replaced localStorage with a live Firebase Firestore backend (project
+       "dustrunner-425bd", collection manifests/dustrunner/items). Everyone
+       who opens this page now sees the same data, updated in real time —
+       adds, deletes, and transfers from any device sync to all others
+       immediately. Export/Import Data now read and write the shared
+       collection instead of local storage. activeTab remains per-device
+       (not shared) since it's just which tab you're looking at.
+
+       NOTE: Firestore rules were created in test mode, which expires
+       2026-10-11 and locks out ALL access — including the app itself —
+       once it does. Real security rules (scoped to just the
+       manifests/dustrunner/items path) need to be written and pasted
+       into the Firebase console before that date.
+  v6 — Removed Export Data / Import Data. They existed to solve "the log
+       needs to survive a change of who's running it," which the live
+       Firestore backend (v5) already solves on its own. Share Summary
+       stays — it solves a different problem (a human-readable snapshot
+       to paste outside the app), not made obsolete by the backend.
+       Note: there is no undo for Clear All now that the backup export
+       is gone.
+  v7 — Clear All now opens a themed in-app confirm modal instead of the
+       browser's plain confirm() popup (same protection, matches the UI).
+       Share Summary reorganized to mirror the tabs in order: All, then
+       each character, then Sell, then a new Unavailable section (it was
+       missing from the summary before) — grand total stays at the end.
+       Increased font sizes and widened the device frame throughout;
+       brightened --dim and --tan-dim for better contrast against the
+       dark background.
 
   Pending / ideas not yet built:
-  (none currently — add here as they come up)
+  - Write and deploy real Firestore security rules before the test-mode
+    rules expire (see v5 note above).
 -->
 <html lang="en">
 <head>
@@ -35,12 +64,12 @@
   --surface:  #1c1a15;
   --surface2: #242018;
   --border:   #302c22;
-  --tan:      #c8a97a;
-  --tan-dim:  #7a6645;
-  --text:     #d4cfc4;
-  --dim:      #6b6455;
-  --red:      #c0392b;
-  --green:    #5d8a52;
+  --tan:      #d4b989;
+  --tan-dim:  #a88a5c;
+  --text:     #e4dfd3;
+  --dim:      #948a79;
+  --red:      #d9483a;
+  --green:    #6fa363;
   --mono:     'Share Tech Mono', monospace;
 }
 
@@ -51,13 +80,13 @@ body{
   min-height:100vh;
   display:flex;
   justify-content:center;
-  padding:20px 12px 40px;
+  padding:26px 16px 48px;
 }
 
 /* ── Device frame ── */
 .device{
   width:100%;
-  max-width:680px;
+  max-width:780px;
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:8px;
@@ -91,69 +120,70 @@ body{
 .banner{
   background:var(--bg);
   border-bottom:1px solid var(--border);
-  padding:18px 20px 14px;
+  padding:22px 26px 18px;
 }
 .brand-row{
   display:flex;
   align-items:baseline;
-  gap:12px;
-  margin-bottom:6px;
+  gap:14px;
+  margin-bottom:8px;
 }
 .brand-logo{
-  font-size:22px;
+  font-size:27px;
   letter-spacing:.18em;
   color:var(--tan);
   font-weight:400;
 }
 .brand-sub{
-  font-size:10px;
+  font-size:12px;
   color:var(--tan-dim);
   letter-spacing:.12em;
 }
 .brand-tagline{
-  font-size:9px;
+  font-size:11px;
   color:var(--dim);
   letter-spacing:.06em;
-  margin-bottom:10px;
+  margin-bottom:12px;
 }
 .banner-meta{
   display:flex;
-  gap:20px;
+  gap:24px;
   border-top:1px solid var(--border);
-  padding-top:10px;
+  padding-top:12px;
   margin-top:4px;
 }
-.meta-item{ display:flex; flex-direction:column; gap:1px; }
-.meta-label{ font-size:8px; color:var(--dim); letter-spacing:.1em; }
-.meta-value{ font-size:11px; color:var(--text); }
+.meta-item{ display:flex; flex-direction:column; gap:2px; }
+.meta-label{ font-size:10px; color:var(--dim); letter-spacing:.1em; }
+.meta-value{ font-size:13px; color:var(--text); }
 .meta-value.tan{ color:var(--tan); }
 .status-dot{
   display:inline-block;
-  width:6px; height:6px;
+  width:7px; height:7px;
   border-radius:50%;
   background:var(--green);
-  margin-right:5px;
+  margin-right:6px;
   vertical-align:middle;
 }
 
 /* ── Body ── */
-.body{ padding:16px 18px; }
+.body{ padding:20px 22px; }
 
 /* ── Tabs ── */
 .tabs{
   display:flex;
   gap:2px;
-  margin-bottom:14px;
+  margin-bottom:16px;
   border-bottom:1px solid var(--border);
   padding-bottom:0;
+  flex-wrap:wrap;
 }
 .tab{
   background:none;
   border:none;
   font-family:var(--mono);
-  font-size:11px;
+  font-size:13px;
   color:var(--dim);
-  padding:6px 12px;
+  padding:7px 14px;
   cursor:pointer;
   border-bottom:2px solid transparent;
   margin-bottom:-1px;
@@ -168,30 +198,30 @@ body{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:8px;
-  margin-top:16px;
+  margin-bottom:10px;
+  margin-top:18px;
 }
 .section-hdr:first-child{ margin-top:0; }
-.section-title{ font-size:9px; color:var(--tan-dim); letter-spacing:.14em; }
-.section-total{ font-size:11px; color:var(--tan); }
+.section-title{ font-size:11px; color:var(--tan-dim); letter-spacing:.14em; }
+.section-total{ font-size:13px; color:var(--tan); }
 
 /* ── Item rows ── */
 .item-row{
   display:grid;
   grid-template-columns:1fr auto auto;
   align-items:center;
-  gap:8px;
-  padding:6px 8px;
+  gap:10px;
+  padding:8px 10px;
   border-bottom:1px solid var(--border);
   transition:background .1s;
 }
 .item-row:last-child{ border-bottom:none; }
 .item-row:hover{ background:var(--surface2); }
-.item-name{ font-size:11px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.item-session{ font-size:9px; color:var(--dim); margin-top:1px; }
-.item-val{ font-size:11px; color:var(--text); text-align:right; white-space:nowrap; }
+.item-name{ font-size:13px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.item-session{ font-size:11px; color:var(--dim); margin-top:2px; }
+.item-val{ font-size:13px; color:var(--text); text-align:right; white-space:nowrap; }
 .item-tag{
-  font-size:9px; padding:1px 5px; border-radius:2px;
+  font-size:11px; padding:2px 6px; border-radius:2px;
   border:1px solid var(--border); color:var(--dim);
   white-space:nowrap;
 }
@@ -199,7 +229,7 @@ body{
 .item-tag.sell{ border-color:var(--tan-dim); color:var(--tan-dim); background:#1a1508; }
 .item-tag.unavailable{ border-color:var(--red); color:var(--red); background:#1f0a08; }
 
-.empty-msg{ text-align:center; padding:24px; font-size:10px; color:var(--dim); }
+.empty-msg{ text-align:center; padding:28px; font-size:12px; color:var(--dim); }
 
 /* ── Row action buttons ── */
 .act-btn{
@@ -207,8 +237,8 @@ body{
   border:1px solid var(--border);
   color:var(--dim);
   font-family:var(--mono);
-  font-size:9px;
-  padding:2px 7px;
+  font-size:11px;
+  padding:3px 9px;
   border-radius:2px;
   cursor:pointer;
   white-space:nowrap;
@@ -217,7 +247,7 @@ body{
 .act-btn:hover{ border-color:var(--tan-dim); color:var(--tan-dim); }
 .del-btn{
   background:none; border:none; color:var(--dim);
-  font-family:var(--mono); font-size:12px; cursor:pointer; padding:0 2px;
+  font-family:var(--mono); font-size:14px; cursor:pointer; padding:0 3px;
 }
 .del-btn:hover{ color:var(--red); }
 
@@ -226,27 +256,27 @@ body{
   background:var(--bg);
   border:1px solid var(--border);
   border-radius:4px;
-  padding:10px 12px;
+  padding:12px 14px;
   margin-top:4px;
 }
 .sell-row{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:4px 0;
+  padding:5px 0;
   border-bottom:1px solid var(--border);
-  font-size:11px;
+  font-size:13px;
 }
 .sell-row:last-child{ border-bottom:none; }
-.sell-name{ color:var(--text); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:8px; }
+.sell-name{ color:var(--text); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:10px; }
 .sell-est{ color:var(--tan-dim); white-space:nowrap; }
 .sell-foot{
   display:flex;
   justify-content:space-between;
-  margin-top:8px;
-  padding-top:8px;
+  margin-top:10px;
+  padding-top:10px;
   border-top:1px solid var(--border);
-  font-size:10px;
+  font-size:12px;
 }
 .sell-foot-label{ color:var(--dim); }
 .sell-foot-val{ color:var(--tan); }
@@ -256,21 +286,21 @@ body{
   background:var(--bg);
   border:1px solid var(--border);
   border-radius:4px;
-  padding:12px;
-  margin-top:14px;
+  padding:14px;
+  margin-top:16px;
 }
-.add-title{ font-size:9px; color:var(--dim); letter-spacing:.1em; margin-bottom:10px; }
-.add-grid{ display:grid; grid-template-columns:1fr 70px 90px; gap:6px; margin-bottom:6px; }
-.add-grid2{ display:grid; grid-template-columns:1fr 1fr 80px; gap:6px; margin-bottom:8px; }
-.field-label{ font-size:8px; color:var(--dim); margin-bottom:2px; letter-spacing:.06em; }
+.add-title{ font-size:11px; color:var(--dim); letter-spacing:.1em; margin-bottom:12px; }
+.add-grid{ display:grid; grid-template-columns:1fr 80px 100px; gap:8px; margin-bottom:8px; }
+.add-grid2{ display:grid; grid-template-columns:1fr 1fr 90px; gap:8px; margin-bottom:10px; }
+.field-label{ font-size:10px; color:var(--dim); margin-bottom:3px; letter-spacing:.06em; }
 .field-input{
   width:100%;
   background:var(--surface);
   border:1px solid var(--border);
   color:var(--text);
   font-family:var(--mono);
-  font-size:11px;
-  padding:4px 7px;
+  font-size:13px;
+  padding:6px 9px;
   border-radius:3px;
 }
 .field-input:focus{ outline:none; border-color:var(--tan-dim); }
@@ -280,16 +310,16 @@ body{
   border:1px solid var(--border);
   color:var(--text);
   font-family:var(--mono);
-  font-size:11px;
-  padding:4px 6px;
+  font-size:13px;
+  padding:6px 8px;
   border-radius:3px;
   cursor:pointer;
 }
-.add-btn-row{ display:flex; gap:6px; }
+.add-btn-row{ display:flex; gap:8px; }
 .btn{
   font-family:var(--mono);
-  font-size:11px;
-  padding:5px 14px;
+  font-size:13px;
+  padding:7px 16px;
   border-radius:3px;
   cursor:pointer;
   border:1px solid;
@@ -300,32 +330,20 @@ body{
 .btn-primary{ background:var(--tan); border-color:var(--tan); color:var(--bg); }
 .btn-ghost{ background:none; border-color:var(--border); color:var(--dim); }
 .btn-ghost:hover{ border-color:var(--tan-dim); color:var(--tan-dim); }
+.btn-danger{ background:var(--red); border-color:var(--red); color:#fff; }
 .btn-share{
   margin-left:auto;
   background:none;
   border:1px solid var(--tan-dim);
   color:var(--tan-dim);
   font-family:var(--mono);
-  font-size:10px;
-  padding:4px 12px;
+  font-size:12px;
+  padding:5px 14px;
   border-radius:3px;
   cursor:pointer;
   transition:all .15s;
 }
 .btn-share:hover{ border-color:var(--tan); color:var(--tan); }
-.btn-util{
-  background:none;
-  border:1px solid var(--border);
-  color:var(--dim);
-  font-family:var(--mono);
-  font-size:10px;
-  padding:4px 10px;
-  border-radius:3px;
-  cursor:pointer;
-  transition:all .15s;
-}
-.btn-util:hover{ border-color:var(--tan-dim); color:var(--tan-dim); }
-.file-label{ display:inline-block; }
 
 /* ── Share modal ── */
 .modal-overlay{
@@ -344,23 +362,24 @@ body{
   border:1px solid var(--tan-dim);
   border-radius:6px;
   width:100%;
-  max-width:560px;
-  padding:18px;
+  max-width:600px;
+  padding:22px;
 }
-.modal-title{ font-size:11px; color:var(--tan); letter-spacing:.1em; margin-bottom:12px; }
+.modal-title{ font-size:13px; color:var(--tan); letter-spacing:.1em; margin-bottom:14px; }
+.modal-body-text{ font-size:13px; color:var(--text); margin-bottom:16px; line-height:1.5; }
 .modal-text{
   background:var(--bg);
   border:1px solid var(--border);
   color:var(--text);
   font-family:var(--mono);
-  font-size:10px;
-  padding:10px;
+  font-size:12px;
+  padding:12px;
   border-radius:3px;
   white-space:pre-wrap;
   line-height:1.6;
   max-height:400px;
   overflow-y:auto;
-  margin-bottom:12px;
+  margin-bottom:14px;
 }
 .modal-btns{ display:flex; gap:8px; justify-content:flex-end; }
 </style>
@@ -384,7 +403,7 @@ body{
       </div>
       <div class="meta-item">
         <span class="meta-label">Status</span>
-        <span class="meta-value"><span class="status-dot"></span>Active</span>
+        <span class="meta-value"><span class="status-dot"></span>Live</span>
       </div>
       <div class="meta-item">
         <span class="meta-label">Last Updated</span>
@@ -392,14 +411,7 @@ body{
       </div>
       <div class="meta-item" style="margin-left:auto">
         <span class="meta-label">&nbsp;</span>
-        <div style="display:flex;gap:6px;align-items:center">
-          <button class="btn-util" onclick="exportData()" title="Download the full manifest as a data file">Export Data</button>
-          <label class="btn-util file-label" title="Load a manifest data file exported earlier">
-            Import Data
-            <input type="file" accept=".json,application/json" onchange="importData(event)" style="display:none">
-          </label>
-          <button class="btn-share" onclick="openShare()">Share Summary</button>
-        </div>
+        <button class="btn-share" onclick="openShare()">Share Summary</button>
       </div>
     </div>
   </div>
@@ -489,7 +501,38 @@ body{
   </div>
 </div>
 
-<script>
+<!-- Clear All confirm modal -->
+<div class="modal-overlay" id="clearModal" onclick="if(event.target===this)closeClearConfirm()">
+  <div class="modal">
+    <div class="modal-title">Clear All Items?</div>
+    <div class="modal-body-text">This deletes every logged item — kept, sell, and unavailable — for the whole crew. Everyone sees it disappear immediately, on every device. This cannot be undone.</div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeClearConfirm()">Cancel</button>
+      <button class="btn btn-danger" onclick="doClearAll()">Clear Everything</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+  onSnapshot, writeBatch, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ── Firebase — shared live data for everyone using this page ────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyCcDZoZlpUbUe7XQuFWruNj3lx6k_ym43Q",
+  authDomain: "dustrunner-425bd.firebaseapp.com",
+  projectId: "dustrunner-425bd",
+  storageBucket: "dustrunner-425bd.firebasestorage.app",
+  messagingSenderId: "788611586478",
+  appId: "1:788611586478:web:b213ba11422d02c855d03f"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const itemsCol = collection(db, 'manifests', 'dustrunner', 'items');
+
 // ── Data ────────────────────────────────────────────────────────────────────
 const CHARS = ['Rast','Grevakh','Cael','Lyra','Chungus'];
 const CHAR_COLORS = {
@@ -497,9 +540,23 @@ const CHAR_COLORS = {
   Lyra:'#9b59b6', Chungus:'#e67e22', Crew:'#7a6645'
 };
 
-let STATE = {items:[], activeTab:'All'};
-try{ const s=localStorage.getItem('cw_manifest'); if(s) STATE=JSON.parse(s); } catch{}
-function save(){ localStorage.setItem('cw_manifest', JSON.stringify(STATE)); }
+// activeTab is per-device UI state only — not shared. Everything in
+// STATE.items comes from Firestore and is shared live with everyone.
+let STATE = { items: [], activeTab: localStorage.getItem('cw_activeTab') || 'All' };
+
+onSnapshot(itemsCol, (snapshot) => {
+  STATE.items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  refresh();
+  updateTimestamp();
+}, (err) => {
+  console.error('Manifest sync error:', err);
+});
+
+function setActiveTab(t){
+  STATE.activeTab = t;
+  localStorage.setItem('cw_activeTab', t);
+  refresh();
+}
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
 function renderTabs(){
@@ -510,7 +567,7 @@ function renderTabs(){
     const btn = document.createElement('button');
     btn.className = 'tab' + (STATE.activeTab===t?' active':'');
     btn.textContent = t;
-    btn.onclick = () => { STATE.activeTab=t; save(); refresh(); };
+    btn.onclick = () => setActiveTab(t);
     tabs.appendChild(btn);
   });
 }
@@ -568,7 +625,7 @@ function renderContent(){
   }
 
   Object.entries(groups).forEach(([session, sitems]) => {
-    html += `<div style="margin-bottom:2px;padding:4px 8px;background:var(--surface2);font-size:9px;color:var(--dim);letter-spacing:.1em">${session}</div>`;
+    html += `<div style="margin-bottom:3px;padding:5px 10px;background:var(--surface2);font-size:11px;color:var(--dim);letter-spacing:.1em">${session}</div>`;
     sitems.forEach(item => {
       html += `<div class="item-row">
         <div>
@@ -580,8 +637,8 @@ function renderContent(){
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <span class="item-tag kept">Kept</span>
-          <button class="act-btn" onclick="openTransfer(${item.id})">Transfer</button>
-          <button class="del-btn" onclick="deleteItem(${item.id})" title="Remove">&times;</button>
+          <button class="act-btn" onclick="openTransfer('${item.id}')">Transfer</button>
+          <button class="del-btn" onclick="deleteItem('${item.id}')" title="Remove">&times;</button>
         </div>
       </div>`;
     });
@@ -609,10 +666,10 @@ function renderSell(el){
   items.forEach(item => {
     html += `<div class="sell-row">
       <span class="sell-name">${esc(displayName(item))}</span>
-      <span style="color:var(--dim);font-size:9px;margin-right:8px">${esc(item.session)}</span>
+      <span style="color:var(--dim);font-size:11px;margin-right:10px">${esc(item.session)}</span>
       <span class="sell-est">${fmt(itemTotal(item)*0.1)}</span>
-      <button class="act-btn" style="margin-left:8px" onclick="openTransfer(${item.id})">Transfer</button>
-      <button class="del-btn" style="margin-left:4px" onclick="deleteItem(${item.id})">&times;</button>
+      <button class="act-btn" style="margin-left:8px" onclick="openTransfer('${item.id}')">Transfer</button>
+      <button class="del-btn" style="margin-left:4px" onclick="deleteItem('${item.id}')">&times;</button>
     </div>`;
   });
   html += `<div class="sell-foot">
@@ -641,10 +698,10 @@ function renderUnavailable(el){
   items.forEach(item => {
     html += `<div class="sell-row">
       <span class="sell-name">${esc(displayName(item))}</span>
-      <span style="color:var(--dim);font-size:9px;margin-right:8px">${esc(item.session)}</span>
+      <span style="color:var(--dim);font-size:11px;margin-right:10px">${esc(item.session)}</span>
       <span class="item-tag unavailable">Unavailable</span>
-      <button class="act-btn" style="margin-left:8px" onclick="openTransfer(${item.id})">Transfer</button>
-      <button class="del-btn" style="margin-left:4px" onclick="deleteItem(${item.id})">&times;</button>
+      <button class="act-btn" style="margin-left:8px" onclick="openTransfer('${item.id}')">Transfer</button>
+      <button class="del-btn" style="margin-left:4px" onclick="deleteItem('${item.id}')">&times;</button>
     </div>`;
   });
   html += '</div>';
@@ -653,7 +710,7 @@ function renderUnavailable(el){
 }
 
 // ── Add item ──────────────────────────────────────────────────────────────────
-function addItem(){
+async function addItem(){
   const name      = document.getElementById('fName').value.trim();
   const qtyRaw    = document.getElementById('fQty').value;
   const qty       = qtyRaw.trim() === '' ? 1 : Math.max(1, parseInt(qtyRaw) || 1);
@@ -662,20 +719,16 @@ function addItem(){
   const session   = document.getElementById('fSession').value.trim()||'Session 1';
   const status    = document.getElementById('fStatus').value;
   if(!name){ document.getElementById('fName').focus(); return; }
-  STATE.items.push({id:Date.now()+Math.random(), name, qty, value, recipient, session, status});
-  save();
   document.getElementById('fName').value='';
   document.getElementById('fQty').value='';
   document.getElementById('fValue').value='';
-  updateTimestamp();
-  refresh();
   document.getElementById('fName').focus();
+  await addDoc(itemsCol, {name, qty, value, recipient, session, status});
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
-function deleteItem(id){
-  STATE.items=STATE.items.filter(i=>i.id!==id);
-  save(); refresh();
+async function deleteItem(id){
+  await deleteDoc(doc(itemsCol, id));
 }
 
 // ── Transfer ──────────────────────────────────────────────────────────────────
@@ -697,7 +750,7 @@ function openTransfer(id){
     .filter(c => !(item.status==='kept' && item.recipient===c))
     .map(c => `<option value="${c}">${c==='Crew'?'Crew (shared)':c}</option>`).join('');
   body.innerHTML = `
-    <div style="margin-bottom:12px;font-size:11px;color:var(--text)">
+    <div style="margin-bottom:14px;font-size:13px;color:var(--text)">
       ${esc(displayName(item))} — currently with <span style="color:var(--tan)">${esc(statusLabel(item))}</span>
     </div>
     <div class="add-grid2" style="grid-template-columns:70px 1fr">
@@ -714,7 +767,7 @@ function openTransfer(id){
         </select>
       </div>
     </div>
-    <div style="font-size:9px;color:var(--dim);margin-top:8px">Moving fewer than the full stack splits it — the rest stays where it is.</div>
+    <div style="font-size:11px;color:var(--dim);margin-top:10px">Moving fewer than the full stack splits it — the rest stays where it is.</div>
   `;
   document.getElementById('transferModal').classList.add('open');
 }
@@ -724,7 +777,7 @@ function closeTransfer(){
   transferItemId = null;
 }
 
-function confirmTransfer(){
+async function confirmTransfer(){
   const item = STATE.items.find(i=>i.id===transferItemId);
   if(!item) return closeTransfer();
 
@@ -738,16 +791,17 @@ function confirmTransfer(){
   else if(dest === '__unavailable'){ newStatus = 'unavailable'; }
   else { newStatus = 'kept'; newRecipient = dest; }
 
+  closeTransfer();
+
   if(moveQty >= maxQty){
     // Move the whole stack in place — no split needed
-    item.status = newStatus;
-    item.recipient = newRecipient;
-    if(!item.qty) item.qty = 1;
+    await updateDoc(doc(itemsCol, item.id), {
+      status: newStatus, recipient: newRecipient, qty: item.qty || 1
+    });
   } else {
     // Split: shrink the original stack, create a new item for the moved portion
-    item.qty = maxQty - moveQty;
-    STATE.items.push({
-      id: Date.now() + Math.random(),
+    await updateDoc(doc(itemsCol, item.id), { qty: maxQty - moveQty });
+    await addDoc(itemsCol, {
       name: item.name,
       qty: moveQty,
       value: item.value,
@@ -756,17 +810,23 @@ function confirmTransfer(){
       status: newStatus,
     });
   }
-
-  save();
-  updateTimestamp();
-  closeTransfer();
-  refresh();
 }
 
 // ── Clear ─────────────────────────────────────────────────────────────────────
 function clearAll(){
-  if(!confirm('Clear all logged items?')) return;
-  STATE.items=[]; save(); refresh();
+  document.getElementById('clearModal').classList.add('open');
+}
+
+function closeClearConfirm(){
+  document.getElementById('clearModal').classList.remove('open');
+}
+
+async function doClearAll(){
+  closeClearConfirm();
+  const snap = await getDocs(itemsCol);
+  const batch = writeBatch(db);
+  snap.forEach(d => batch.delete(d.ref));
+  await batch.commit();
 }
 
 // ── Share ─────────────────────────────────────────────────────────────────────
@@ -777,7 +837,20 @@ function openShare(){
   lines.push('Seraphina  //  '+now);
   lines.push('');
 
-  // Per character
+  // All — every kept item, everyone, recipient tagged (mirrors the All tab)
+  const allKeptItems = STATE.items.filter(i=>i.status==='kept');
+  if(allKeptItems.length>0){
+    const allTotal = allKeptItems.reduce((s,i)=>s+itemTotal(i),0);
+    lines.push('── All ────────────────────────');
+    allKeptItems.forEach(i => {
+      const label = `${displayName(i)} (${i.recipient})`;
+      lines.push('  '+label.padEnd(38,' ')+fmt(itemTotal(i)));
+    });
+    lines.push('  Total: '+fmt(allTotal));
+    lines.push('');
+  }
+
+  // Per character (mirrors each character tab)
   CHARS.forEach(c => {
     const mine = STATE.items.filter(i=>i.status==='kept'&&(i.recipient===c||i.recipient==='Crew'));
     if(mine.length===0) return;
@@ -796,13 +869,21 @@ function openShare(){
     lines.push('');
   }
 
-  // Sell bucket
+  // Sell bucket (mirrors the Sell tab)
   const sell = STATE.items.filter(i=>i.status==='sell');
   if(sell.length>0){
     lines.push('── To Sell ────────────────────');
     sell.forEach(i=>lines.push('  '+displayName(i).padEnd(32,' ')+'~'+fmt(itemTotal(i)*0.1)));
     const est=sell.reduce((s,i)=>s+itemTotal(i)*0.1,0);
     lines.push('  Estimated proceeds: '+fmt(est));
+    lines.push('');
+  }
+
+  // Unavailable (mirrors the Unavailable tab)
+  const unavailable = STATE.items.filter(i=>i.status==='unavailable');
+  if(unavailable.length>0){
+    lines.push('── Unavailable (Lost / Destroyed / Given Away) ──');
+    unavailable.forEach(i=>lines.push('  '+displayName(i).padEnd(32,' ')+fmt(itemTotal(i))+' face value'));
     lines.push('');
   }
 
@@ -857,41 +938,6 @@ function downloadShareText(){
   }
 }
 
-// ── Export / Import full data ────────────────────────────────────────────────
-function exportData(){
-  const payload = {
-    exportedFrom: 'Dustrunner Crew Manifest',
-    exportedAt: new Date().toISOString(),
-    state: STATE,
-  };
-  downloadFile(`dustrunner-manifest-data-${dateStamp()}.json`, JSON.stringify(payload, null, 2), 'application/json');
-}
-
-function importData(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try{
-      const parsed = JSON.parse(reader.result);
-      const incoming = parsed && parsed.state ? parsed.state : parsed;
-      if(!incoming || !Array.isArray(incoming.items)){
-        alert('That file doesn\'t look like a Dustrunner manifest export.');
-        return;
-      }
-      if(!confirm(`Import this manifest? It contains ${incoming.items.length} item(s) and will replace what's currently loaded on this device.`)) return;
-      STATE = incoming;
-      save();
-      updateTimestamp();
-      refresh();
-    } catch(err){
-      alert('Could not read that file — make sure it\'s an unmodified manifest export.');
-    }
-    event.target.value = '';
-  };
-  reader.readAsText(file);
-}
-
 // ── Timestamp ─────────────────────────────────────────────────────────────────
 function updateTimestamp(){
   document.getElementById('lastUpdated').textContent =
@@ -907,9 +953,16 @@ function refresh(){
   renderContent();
 }
 
+// ── Expose to inline onclick= handlers (this is a module, so nothing is
+//    global by default) ───────────────────────────────────────────────────────
+Object.assign(window, {
+  addItem, deleteItem, clearAll, closeClearConfirm, doClearAll,
+  openShare, closeShare, copyShare, downloadShareText,
+  openTransfer, closeTransfer, confirmTransfer,
+});
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.getElementById('fSession').value='Session 1';
-updateTimestamp();
 refresh();
 </script>
 </body>
