@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  DUSTRUNNER — CREW MANIFEST — v1.1
+  DUSTRUNNER — CREW MANIFEST — v1.2
   Version history now lives in CHANGELOG.md, not here. Still pending:
   real Firestore security rules before the test-mode rules expire
   2026-10-11 (see CHANGELOG.md v0.5 for context).
@@ -257,8 +257,38 @@ body{
   margin-top:16px;
 }
 .add-title{ font-size:11px; color:var(--dim); letter-spacing:.1em; margin-bottom:12px; }
+.add-grid-desc{ display:grid; grid-template-columns:1fr 220px; gap:8px; margin-bottom:8px; }
 .add-grid4{ display:grid; grid-template-columns:70px 100px 70px 100px; gap:8px; margin-bottom:8px; }
 .add-grid2{ display:grid; grid-template-columns:1fr 1fr 90px; gap:8px; margin-bottom:10px; }
+.field-wrap{ position:relative; }
+.suggest-list{
+  position:absolute;
+  top:100%; left:0; right:0;
+  background:var(--surface2);
+  border:1px solid var(--tan-dim);
+  border-top:none;
+  border-radius:0 0 3px 3px;
+  max-height:190px;
+  overflow-y:auto;
+  z-index:20;
+  display:none;
+}
+.suggest-list.open{ display:block; }
+.suggest-item{
+  padding:6px 9px;
+  font-size:12px;
+  cursor:pointer;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.suggest-item:last-child{ border-bottom:none; }
+.suggest-item:hover, .suggest-item.active{ background:var(--surface); }
+.suggest-item .sname{ color:var(--text); }
+.suggest-item:hover .sname, .suggest-item.active .sname{ color:var(--tan); }
+.suggest-item .sfamily{ color:var(--dim); font-size:10px; white-space:nowrap; }
 .field-label{ font-size:10px; color:var(--dim); margin-bottom:3px; letter-spacing:.06em; }
 .field-input{
   width:100%;
@@ -354,7 +384,7 @@ body{
 <body>
 
 <div class="device">
-<span class="version-tag">v1.1</span>
+<span class="version-tag">v1.2</span>
 <div class="device-foot">
 
   <!-- ── Banner ── -->
@@ -396,9 +426,17 @@ body{
     <!-- Add form -->
     <div class="add-section">
       <div class="add-title">Log New Item</div>
-      <div style="margin-bottom:8px">
-        <div class="field-label">Description</div>
-        <input class="field-input" id="fName" placeholder="Item name or description…" onkeydown="if(event.key==='Enter')addItem()">
+      <div class="add-grid-desc">
+        <div class="field-wrap">
+          <div class="field-label">Description</div>
+          <input class="field-input" id="fName" placeholder="Item name or description…" autocomplete="off"
+                 oninput="onNameInput()" onkeydown="onNameKeydown(event)" onblur="setTimeout(closeSuggestions,150)">
+          <div id="nameSuggest" class="suggest-list"></div>
+        </div>
+        <div>
+          <div class="field-label">Family</div>
+          <input class="field-input" id="fFamily" placeholder="e.g. Weapon: Small Arm" onkeydown="if(event.key==='Enter')addItem()">
+        </div>
       </div>
       <div class="add-grid4">
         <div>
@@ -722,7 +760,7 @@ function renderContent(){
       html += `<div class="item-row">
         <div>
           <div class="item-name">${esc(displayName(item))}</div>
-          <div class="item-session">${esc(item.recipient)}</div>
+          <div class="item-session">${esc(item.recipient)}${item.family ? ` <span class="item-tag" style="margin-left:6px">${esc(item.family)}</span>` : ''}</div>
         </div>
         <div style="text-align:right">
           <div class="item-val">${fmt(itemTotal(item))}</div>
@@ -760,6 +798,7 @@ function renderSell(el){
     const meta = itemMetaText(item);
     html += `<div class="sell-row">
       <span class="sell-name">${esc(displayName(item))}</span>
+      ${item.family ? `<span class="item-tag" style="margin-right:8px">${esc(item.family)}</span>` : ''}
       ${meta ? `<span class="item-meta" style="margin-right:10px">${esc(meta)}</span>` : ''}
       <span style="color:var(--dim);font-size:11px;margin-right:10px">${esc(item.session)}</span>
       <span class="sell-est">${fmt(itemTotal(item)*0.1)}</span>
@@ -794,6 +833,7 @@ function renderUnavailable(el){
     const meta = itemMetaText(item);
     html += `<div class="sell-row">
       <span class="sell-name">${esc(displayName(item))}</span>
+      ${item.family ? `<span class="item-tag" style="margin-right:8px">${esc(item.family)}</span>` : ''}
       ${meta ? `<span class="item-meta" style="margin-right:10px">${esc(meta)}</span>` : ''}
       <span style="color:var(--dim);font-size:11px;margin-right:10px">${esc(item.session)}</span>
       <span class="item-tag unavailable">Unavailable</span>
@@ -809,6 +849,7 @@ function renderUnavailable(el){
 // ── Add item ──────────────────────────────────────────────────────────────────
 async function addItem(){
   const name      = document.getElementById('fName').value.trim();
+  const family    = document.getElementById('fFamily').value.trim();
   const qtyRaw    = document.getElementById('fQty').value;
   const qty       = qtyRaw.trim() === '' ? 1 : Math.max(1, parseInt(qtyRaw) || 1);
   const value     = parseFloat(document.getElementById('fValue').value)||0;
@@ -819,13 +860,15 @@ async function addItem(){
   const session   = document.getElementById('fSession').value.trim()||'Session 1';
   const status    = document.getElementById('fStatus').value;
   if(!name){ document.getElementById('fName').focus(); return; }
+  closeSuggestions();
   document.getElementById('fName').value='';
+  document.getElementById('fFamily').value='';
   document.getElementById('fQty').value='';
   document.getElementById('fValue').value='';
   document.getElementById('fLevel').value='';
   document.getElementById('fBulk').value='';
   document.getElementById('fName').focus();
-  await addDoc(itemsCol, {name, qty, value, level, bulk, recipient, session, status});
+  await addDoc(itemsCol, {name, family, qty, value, level, bulk, recipient, session, status});
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
@@ -905,6 +948,7 @@ async function confirmTransfer(){
     await updateDoc(doc(itemsCol, item.id), { qty: maxQty - moveQty });
     await addDoc(itemsCol, {
       name: item.name,
+      family: item.family ?? '',
       qty: moveQty,
       value: item.value,
       level: item.level ?? null,
@@ -1051,6 +1095,95 @@ function updateTimestamp(){
 // ── Escape ────────────────────────────────────────────────────────────────────
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// ── Item database (static file, bundled alongside index.html) ────────────────
+// Not shared/live — this is reference data curated by the GM, not player data.
+// To add more entries later: edit items-database.json and re-upload it; no
+// code changes needed here.
+let ITEM_DB = [];
+fetch('items-database.json')
+  .then(r => r.json())
+  .then(data => { ITEM_DB = data; })
+  .catch(err => console.error('Could not load items-database.json:', err));
+
+function normalizeForSearch(s){
+  return String(s).toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function searchItemDB(query){
+  const q = normalizeForSearch(query);
+  if(!q) return [];
+  return ITEM_DB.filter(item => normalizeForSearch(item.name).includes(q)).slice(0, 8);
+}
+
+// ── Description autocomplete ─────────────────────────────────────────────────
+let suggestIndex = -1;
+let currentSuggestions = [];
+
+function onNameInput(){
+  const val = document.getElementById('fName').value;
+  currentSuggestions = searchItemDB(val);
+  suggestIndex = -1;
+  renderSuggestions();
+}
+
+function renderSuggestions(){
+  const box = document.getElementById('nameSuggest');
+  if(currentSuggestions.length === 0){
+    box.classList.remove('open');
+    box.innerHTML = '';
+    return;
+  }
+  box.innerHTML = currentSuggestions.map((item, i) => `
+    <div class="suggest-item${i===suggestIndex?' active':''}" onmousedown="selectSuggestion(${i})">
+      <span class="sname">${esc(item.name)}</span>
+      <span class="sfamily">${esc(item.family||'')}</span>
+    </div>
+  `).join('');
+  box.classList.add('open');
+}
+
+function selectSuggestion(i){
+  const item = currentSuggestions[i];
+  if(!item) return;
+  document.getElementById('fName').value = item.name;
+  document.getElementById('fFamily').value = item.family || '';
+  document.getElementById('fValue').value = (item.value===null||item.value===undefined) ? '' : item.value;
+  document.getElementById('fLevel').value = (item.level===null||item.level===undefined) ? '' : item.level;
+  document.getElementById('fBulk').value = item.bulk || '';
+  closeSuggestions();
+  document.getElementById('fQty').focus();
+}
+
+function closeSuggestions(){
+  suggestIndex = -1;
+  currentSuggestions = [];
+  const box = document.getElementById('nameSuggest');
+  if(box){ box.classList.remove('open'); box.innerHTML = ''; }
+}
+
+function onNameKeydown(event){
+  if(currentSuggestions.length > 0 && (event.key==='ArrowDown' || event.key==='ArrowUp')){
+    event.preventDefault();
+    if(event.key==='ArrowDown') suggestIndex = Math.min(suggestIndex+1, currentSuggestions.length-1);
+    else suggestIndex = Math.max(suggestIndex-1, 0);
+    renderSuggestions();
+    return;
+  }
+  if(event.key==='Enter'){
+    if(suggestIndex >= 0 && currentSuggestions[suggestIndex]){
+      event.preventDefault();
+      selectSuggestion(suggestIndex);
+      return;
+    }
+    closeSuggestions();
+    addItem();
+    return;
+  }
+  if(event.key==='Escape'){
+    closeSuggestions();
+  }
+}
+
 // ── Refresh ───────────────────────────────────────────────────────────────────
 function refresh(){
   renderTabs();
@@ -1064,6 +1197,7 @@ Object.assign(window, {
   openShare, closeShare, copyShare, downloadShareText,
   openTransfer, closeTransfer, confirmTransfer,
   openSettings, closeSettings, addCharacter, removeCharacter,
+  onNameInput, onNameKeydown, selectSuggestion, closeSuggestions,
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────────

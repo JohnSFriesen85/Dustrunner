@@ -1,0 +1,821 @@
+[
+  {
+    "name": "Unarmed Strike",
+    "family": "Weapon: Basic Melee",
+    "level": null,
+    "value": null,
+    "bulk": ""
+  },
+  {
+    "name": "Club",
+    "family": "Weapon: Basic Melee",
+    "level": 0,
+    "value": null,
+    "bulk": "L"
+  },
+  {
+    "name": "Baton, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 1,
+    "value": 90,
+    "bulk": "L"
+  },
+  {
+    "name": "Battleglove, Cestus",
+    "family": "Weapon: Basic Melee",
+    "level": 1,
+    "value": 100,
+    "bulk": "L"
+  },
+  {
+    "name": "Handaxe, Basic",
+    "family": "Weapon: Basic Melee",
+    "level": 1,
+    "value": 90,
+    "bulk": "L"
+  },
+  {
+    "name": "Knife, Survival",
+    "family": "Weapon: Basic Melee",
+    "level": 1,
+    "value": 95,
+    "bulk": "L"
+  },
+  {
+    "name": "Shillelagh, Destroyer",
+    "family": "Weapon: Basic Melee",
+    "level": 1,
+    "value": 200,
+    "bulk": "1"
+  },
+  {
+    "name": "Sword Cane, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 1,
+    "value": 250,
+    "bulk": "L"
+  },
+  {
+    "name": "Syringe Stick, Standard",
+    "family": "Weapon: Basic Melee",
+    "level": 1,
+    "value": 125,
+    "bulk": "L"
+  },
+  {
+    "name": "Idaran Force Training Baton",
+    "family": "Weapon: Basic Melee",
+    "level": 2,
+    "value": 400,
+    "bulk": "L"
+  },
+  {
+    "name": "Bone Cestus, Austere",
+    "family": "Weapon: Basic Melee",
+    "level": 2,
+    "value": 600,
+    "bulk": "L"
+  },
+  {
+    "name": "Dueling Sword, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 2,
+    "value": 475,
+    "bulk": "L"
+  },
+  {
+    "name": "Electric Prod, Jolt",
+    "family": "Weapon: Basic Melee",
+    "level": 2,
+    "value": 900,
+    "bulk": "1"
+  },
+  {
+    "name": "Sap, Light",
+    "family": "Weapon: Basic Melee",
+    "level": 2,
+    "value": 450,
+    "bulk": "L"
+  },
+  {
+    "name": "Sledge",
+    "family": "Weapon: Basic Melee",
+    "level": 3,
+    "value": 1050,
+    "bulk": "1"
+  },
+  {
+    "name": "Switchblade, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 3,
+    "value": 1300,
+    "bulk": "L"
+  },
+  {
+    "name": "Inferno Knife",
+    "family": "Weapon: Basic Melee",
+    "level": 4,
+    "value": 2100,
+    "bulk": "L"
+  },
+  {
+    "name": "Tailblade",
+    "family": "Weapon: Basic Melee",
+    "level": 4,
+    "value": 2300,
+    "bulk": "L"
+  },
+  {
+    "name": "Clockbaton, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 4,
+    "value": 2200,
+    "bulk": "1"
+  },
+  {
+    "name": "Dueling Sword (Corpse Fleet), Converted",
+    "family": "Weapon: Basic Melee",
+    "level": 4,
+    "value": 2100,
+    "bulk": "L"
+  },
+  {
+    "name": "Handaxe, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 4,
+    "value": 1825,
+    "bulk": "L"
+  },
+  {
+    "name": "Sword Cane, Advanced",
+    "family": "Weapon: Basic Melee",
+    "level": 4,
+    "value": 2100,
+    "bulk": "L"
+  },
+  {
+    "name": "Red Star Plasma Kukri",
+    "family": "Weapon: Basic Melee",
+    "level": 4,
+    "value": 2450,
+    "bulk": "L"
+  },
+  {
+    "name": "Ignurso Knuckles, Ember",
+    "family": "Weapon: Basic Melee",
+    "level": 5,
+    "value": 3100,
+    "bulk": "L"
+  },
+  {
+    "name": "Retractable Spike, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 5,
+    "value": 3150,
+    "bulk": "L"
+  },
+  {
+    "name": "Spined Blade, Basic",
+    "family": "Weapon: Basic Melee",
+    "level": 5,
+    "value": 2600,
+    "bulk": "L"
+  },
+  {
+    "name": "Syringe Stick, Sharp-pointed",
+    "family": "Weapon: Basic Melee",
+    "level": 5,
+    "value": 2650,
+    "bulk": "L"
+  },
+  {
+    "name": "Clocksword, Second",
+    "family": "Weapon: Basic Melee",
+    "level": 6,
+    "value": 4500,
+    "bulk": "1"
+  },
+  {
+    "name": "Electric Prod, Impulse",
+    "family": "Weapon: Basic Melee",
+    "level": 6,
+    "value": 4500,
+    "bulk": "1"
+  },
+  {
+    "name": "Polyclub, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 6,
+    "value": 4200,
+    "bulk": "L"
+  },
+  {
+    "name": "Retractable Stinger, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 6,
+    "value": 4300,
+    "bulk": "L"
+  },
+  {
+    "name": "Sap, Medium",
+    "family": "Weapon: Basic Melee",
+    "level": 6,
+    "value": 3900,
+    "bulk": "L"
+  },
+  {
+    "name": "Shell Knuckles, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 6,
+    "value": 4050,
+    "bulk": "L"
+  },
+  {
+    "name": "Hook Knife",
+    "family": "Weapon: Basic Melee",
+    "level": 7,
+    "value": 6300,
+    "bulk": "L"
+  },
+  {
+    "name": "Bone Cestus, Measured",
+    "family": "Weapon: Basic Melee",
+    "level": 7,
+    "value": 5500,
+    "bulk": "L"
+  },
+  {
+    "name": "Knife, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 7,
+    "value": 6000,
+    "bulk": "L"
+  },
+  {
+    "name": "Shillelagh, Cruiser",
+    "family": "Weapon: Basic Melee",
+    "level": 7,
+    "value": 5500,
+    "bulk": "1"
+  },
+  {
+    "name": "Sword Cane, Ultrathin",
+    "family": "Weapon: Basic Melee",
+    "level": 7,
+    "value": 7000,
+    "bulk": "L"
+  },
+  {
+    "name": "Dueling Sword, Buzzblade",
+    "family": "Weapon: Basic Melee",
+    "level": 8,
+    "value": 9500,
+    "bulk": "L"
+  },
+  {
+    "name": "Spined Blade, Buzzblade",
+    "family": "Weapon: Basic Melee",
+    "level": 8,
+    "value": 9400,
+    "bulk": "L"
+  },
+  {
+    "name": "Switchblade, Ultrathin",
+    "family": "Weapon: Basic Melee",
+    "level": 8,
+    "value": 9100,
+    "bulk": "L"
+  },
+  {
+    "name": "Incapacitator",
+    "family": "Weapon: Basic Melee",
+    "level": 9,
+    "value": 14200,
+    "bulk": "L"
+  },
+  {
+    "name": "Handaxe, Sintered",
+    "family": "Weapon: Basic Melee",
+    "level": 9,
+    "value": 12500,
+    "bulk": "L"
+  },
+  {
+    "name": "Ignurso Knuckles, Blaze",
+    "family": "Weapon: Basic Melee",
+    "level": 9,
+    "value": 13500,
+    "bulk": "L"
+  },
+  {
+    "name": "Retractable Stinger, Advanced",
+    "family": "Weapon: Basic Melee",
+    "level": 9,
+    "value": 13900,
+    "bulk": "L"
+  },
+  {
+    "name": "Syringe Stick, Hyper-pointed",
+    "family": "Weapon: Basic Melee",
+    "level": 9,
+    "value": 12000,
+    "bulk": "L"
+  },
+  {
+    "name": "Battleglove, Power",
+    "family": "Weapon: Basic Melee",
+    "level": 10,
+    "value": 16100,
+    "bulk": "L"
+  },
+  {
+    "name": "Clockbaton, Advanced",
+    "family": "Weapon: Basic Melee",
+    "level": 10,
+    "value": 18000,
+    "bulk": "1"
+  },
+  {
+    "name": "Dueling Sword (Corpse Fleet), Officer",
+    "family": "Weapon: Basic Melee",
+    "level": 10,
+    "value": 18795,
+    "bulk": "L"
+  },
+  {
+    "name": "Electric Prod, Storm",
+    "family": "Weapon: Basic Melee",
+    "level": 10,
+    "value": 19000,
+    "bulk": "1"
+  },
+  {
+    "name": "Polyclub, Advanced",
+    "family": "Weapon: Basic Melee",
+    "level": 10,
+    "value": 17400,
+    "bulk": "L"
+  },
+  {
+    "name": "Retractable Spike, Advanced",
+    "family": "Weapon: Basic Melee",
+    "level": 10,
+    "value": 18400,
+    "bulk": "L"
+  },
+  {
+    "name": "Sword Cane, Zero-Edge",
+    "family": "Weapon: Basic Melee",
+    "level": 10,
+    "value": 18000,
+    "bulk": "L"
+  },
+  {
+    "name": "Clocksword, Minute",
+    "family": "Weapon: Basic Melee",
+    "level": 11,
+    "value": 25000,
+    "bulk": "1"
+  },
+  {
+    "name": "Dueling Sword, Ultrathin",
+    "family": "Weapon: Basic Melee",
+    "level": 11,
+    "value": 26000,
+    "bulk": "L"
+  },
+  {
+    "name": "Sap, Heavy",
+    "family": "Weapon: Basic Melee",
+    "level": 11,
+    "value": 23100,
+    "bulk": "L"
+  },
+  {
+    "name": "Spined Blade, Ripper",
+    "family": "Weapon: Basic Melee",
+    "level": 11,
+    "value": 24500,
+    "bulk": "L"
+  },
+  {
+    "name": "Bone Cestus, Imposing",
+    "family": "Weapon: Basic Melee",
+    "level": 12,
+    "value": 32000,
+    "bulk": "L"
+  },
+  {
+    "name": "Dagger, Ultrathin",
+    "family": "Weapon: Basic Melee",
+    "level": 12,
+    "value": 32800,
+    "bulk": "L"
+  },
+  {
+    "name": "Shell Knuckles, Advanced",
+    "family": "Weapon: Basic Melee",
+    "level": 12,
+    "value": 32500,
+    "bulk": "L"
+  },
+  {
+    "name": "Battleglove, Nova",
+    "family": "Weapon: Basic Melee",
+    "level": 13,
+    "value": 52500,
+    "bulk": "L"
+  },
+  {
+    "name": "Ignurso Knuckles, Inferno",
+    "family": "Weapon: Basic Melee",
+    "level": 13,
+    "value": 50250,
+    "bulk": "L"
+  },
+  {
+    "name": "Retractable Stinger, Elite",
+    "family": "Weapon: Basic Melee",
+    "level": 13,
+    "value": 51000,
+    "bulk": "L"
+  },
+  {
+    "name": "Shillelagh, Battleship",
+    "family": "Weapon: Basic Melee",
+    "level": 13,
+    "value": 46000,
+    "bulk": "1"
+  },
+  {
+    "name": "Switchblade, Zero-Edge",
+    "family": "Weapon: Basic Melee",
+    "level": 13,
+    "value": 48600,
+    "bulk": "L"
+  },
+  {
+    "name": "Sword Cane, Molecular Rift",
+    "family": "Weapon: Basic Melee",
+    "level": 13,
+    "value": 50900,
+    "bulk": "L"
+  },
+  {
+    "name": "Syringe Stick, Ultra-pointed",
+    "family": "Weapon: Basic Melee",
+    "level": 13,
+    "value": 46000,
+    "bulk": "L"
+  },
+  {
+    "name": "Dagger, Zero-Edge",
+    "family": "Weapon: Basic Melee",
+    "level": 14,
+    "value": 64400,
+    "bulk": "L"
+  },
+  {
+    "name": "Electric Prod, Surge",
+    "family": "Weapon: Basic Melee",
+    "level": 14,
+    "value": 75000,
+    "bulk": "1"
+  },
+  {
+    "name": "Handaxe, Ultrathin",
+    "family": "Weapon: Basic Melee",
+    "level": 14,
+    "value": 66800,
+    "bulk": "L"
+  },
+  {
+    "name": "Polyclub, Elite",
+    "family": "Weapon: Basic Melee",
+    "level": 14,
+    "value": 65000,
+    "bulk": "L"
+  },
+  {
+    "name": "Spined Blade, Gravity",
+    "family": "Weapon: Basic Melee",
+    "level": 14,
+    "value": 62400,
+    "bulk": "L"
+  },
+  {
+    "name": "Dueling Sword, Ripper",
+    "family": "Weapon: Basic Melee",
+    "level": 15,
+    "value": 109250,
+    "bulk": "L"
+  },
+  {
+    "name": "Retractable Spike, Elite",
+    "family": "Weapon: Basic Melee",
+    "level": 15,
+    "value": 119000,
+    "bulk": "L"
+  },
+  {
+    "name": "Peacemaker",
+    "family": "Weapon: Basic Melee",
+    "level": 16,
+    "value": 185300,
+    "bulk": "L"
+  },
+  {
+    "name": "Clockbaton, Elite",
+    "family": "Weapon: Basic Melee",
+    "level": 16,
+    "value": 165000,
+    "bulk": "1"
+  },
+  {
+    "name": "Shell Knuckles, Elite",
+    "family": "Weapon: Basic Melee",
+    "level": 16,
+    "value": 151000,
+    "bulk": "L"
+  },
+  {
+    "name": "Sword Cane, Dimensional Slice",
+    "family": "Weapon: Basic Melee",
+    "level": 16,
+    "value": 160000,
+    "bulk": "L"
+  },
+  {
+    "name": "Battleglove, Gravity",
+    "family": "Weapon: Basic Melee",
+    "level": 17,
+    "value": 214850,
+    "bulk": "L"
+  },
+  {
+    "name": "Bone Cestus, Severe",
+    "family": "Weapon: Basic Melee",
+    "level": 17,
+    "value": 230000,
+    "bulk": "L"
+  },
+  {
+    "name": "Clocksword, Hour",
+    "family": "Weapon: Basic Melee",
+    "level": 17,
+    "value": 255000,
+    "bulk": "1"
+  },
+  {
+    "name": "Dagger, Molecular Rift",
+    "family": "Weapon: Basic Melee",
+    "level": 17,
+    "value": 275000,
+    "bulk": "L"
+  },
+  {
+    "name": "Dueling Sword (Corpse Fleet), Admiral",
+    "family": "Weapon: Basic Melee",
+    "level": 17,
+    "value": 255150,
+    "bulk": "L"
+  },
+  {
+    "name": "Ignurso Knuckles, Solar Flare",
+    "family": "Weapon: Basic Melee",
+    "level": 17,
+    "value": 262000,
+    "bulk": "L"
+  },
+  {
+    "name": "Retractable Stinger, Paragon",
+    "family": "Weapon: Basic Melee",
+    "level": 17,
+    "value": 268000,
+    "bulk": "L"
+  },
+  {
+    "name": "Syringe Stick, Supreme-pointed",
+    "family": "Weapon: Basic Melee",
+    "level": 17,
+    "value": 225000,
+    "bulk": "L"
+  },
+  {
+    "name": "Dueling Sword, Molecular Rift",
+    "family": "Weapon: Basic Melee",
+    "level": 18,
+    "value": 331200,
+    "bulk": "L"
+  },
+  {
+    "name": "Electric Prod, Tempest",
+    "family": "Weapon: Basic Melee",
+    "level": 18,
+    "value": 385000,
+    "bulk": "1"
+  },
+  {
+    "name": "Polyclub, Paragon",
+    "family": "Weapon: Basic Melee",
+    "level": 18,
+    "value": 345000,
+    "bulk": "L"
+  },
+  {
+    "name": "Spined Blade, Rivener",
+    "family": "Weapon: Basic Melee",
+    "level": 18,
+    "value": 325000,
+    "bulk": "L"
+  },
+  {
+    "name": "Switchblade, Molecular Rift",
+    "family": "Weapon: Basic Melee",
+    "level": 18,
+    "value": 354000,
+    "bulk": "L"
+  },
+  {
+    "name": "Baton, Advanced",
+    "family": "Weapon: Basic Melee",
+    "level": 19,
+    "value": 540000,
+    "bulk": "L"
+  },
+  {
+    "name": "Handaxe, Molecular Rift",
+    "family": "Weapon: Basic Melee",
+    "level": 19,
+    "value": 502000,
+    "bulk": "L"
+  },
+  {
+    "name": "Retractable Spike, Paragon",
+    "family": "Weapon: Basic Melee",
+    "level": 20,
+    "value": 895000,
+    "bulk": "L"
+  },
+  {
+    "name": "Shell Knuckles, Paragon",
+    "family": "Weapon: Basic Melee",
+    "level": 20,
+    "value": 525000,
+    "bulk": "L"
+  },
+  {
+    "name": "Spear, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 1,
+    "value": 375,
+    "bulk": "1"
+  },
+  {
+    "name": "Staff, Battle",
+    "family": "Weapon: Basic Melee",
+    "level": 1,
+    "value": 80,
+    "bulk": "1"
+  },
+  {
+    "name": "Syringe Spear, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 1,
+    "value": 250,
+    "bulk": "L"
+  },
+  {
+    "name": "Warclub",
+    "family": "Weapon: Basic Melee",
+    "level": 2,
+    "value": 450,
+    "bulk": "1"
+  },
+  {
+    "name": "Garrote, Wire",
+    "family": "Weapon: Basic Melee",
+    "level": 2,
+    "value": 900,
+    "bulk": "L"
+  },
+  {
+    "name": "Greataxe, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 3,
+    "value": 1100,
+    "bulk": "1"
+  },
+  {
+    "name": "Lance, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 3,
+    "value": 1450,
+    "bulk": "1"
+  },
+  {
+    "name": "Chitinblade, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 4,
+    "value": 1890,
+    "bulk": "1"
+  },
+  {
+    "name": "Puzzleblade, Conviction",
+    "family": "Weapon: Basic Melee",
+    "level": 4,
+    "value": 2100,
+    "bulk": "1"
+  },
+  {
+    "name": "Living Staff, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 5,
+    "value": 3300,
+    "bulk": "1"
+  },
+  {
+    "name": "Maul, Tactical",
+    "family": "Weapon: Basic Melee",
+    "level": 5,
+    "value": 2750,
+    "bulk": "1"
+  },
+  {
+    "name": "Greataxe, Sintered",
+    "family": "Weapon: Basic Melee",
+    "level": 6,
+    "value": 4150,
+    "bulk": "1"
+  },
+  {
+    "name": "Computer (Tier 1)",
+    "family": "Technological Item: Computer",
+    "level": 2,
+    "value": 50,
+    "bulk": "1"
+  },
+  {
+    "name": "Computer (Tier 2)",
+    "family": "Technological Item: Computer",
+    "level": 4,
+    "value": 250,
+    "bulk": "4"
+  },
+  {
+    "name": "Computer (Tier 3)",
+    "family": "Technological Item: Computer",
+    "level": 6,
+    "value": 1250,
+    "bulk": "9"
+  },
+  {
+    "name": "Computer (Tier 4)",
+    "family": "Technological Item: Computer",
+    "level": 8,
+    "value": 5000,
+    "bulk": "16"
+  },
+  {
+    "name": "Computer (Tier 5)",
+    "family": "Technological Item: Computer",
+    "level": 10,
+    "value": 10000,
+    "bulk": "25"
+  },
+  {
+    "name": "Computer (Tier 6)",
+    "family": "Technological Item: Computer",
+    "level": 12,
+    "value": 20000,
+    "bulk": "36"
+  },
+  {
+    "name": "Computer (Tier 7)",
+    "family": "Technological Item: Computer",
+    "level": 14,
+    "value": 40000,
+    "bulk": "49"
+  },
+  {
+    "name": "Computer (Tier 8)",
+    "family": "Technological Item: Computer",
+    "level": 16,
+    "value": 80000,
+    "bulk": "64"
+  },
+  {
+    "name": "Computer (Tier 9)",
+    "family": "Technological Item: Computer",
+    "level": 18,
+    "value": 160000,
+    "bulk": "81"
+  },
+  {
+    "name": "Computer (Tier 10)",
+    "family": "Technological Item: Computer",
+    "level": 20,
+    "value": 320000,
+    "bulk": "100"
+  }
+]

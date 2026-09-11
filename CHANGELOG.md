@@ -67,3 +67,25 @@ forward.
 - Added a version tag in the corner of the app.
 - Moved version history out of the code entirely — this file is now the
   only changelog.
+
+## v1.2
+- Added a **Family** field to item logging (e.g. "Weapon: Small Arm"),
+  shown next to the item name alongside the recipient, everywhere an item
+  appears.
+- Added an item database, sourced from Archive of Nethys: `items-database.json`,
+  a static file that sits alongside `index.html` — not shared/live, since
+  it's GM-curated reference data rather than player data. To add more
+  entries, edit that file and re-upload it; no app code changes needed.
+- Added autocomplete on the Description field. Typing filters the database
+  by plain substring match (not "starts with"), so "auto pistol" matches
+  both "Tactical Auto Pistol" and "Auto Pistol, Tactical" — no special
+  handling needed for AoN's comma-inverted naming, since stripping
+  punctuation before matching handles it automatically.
+- Selecting a suggestion fills in Family, Value, Level, and Bulk — all
+  four stay fully editable afterward, and typing something not in the
+  database works exactly as before.
+- Current database coverage: Basic Melee weapons (one- and two-handed)
+  and Computers (all 10 tiers, values derived from the tier rule). The
+  remaining ~23 categories from the URL list get added incrementally —
+  each addition is just a data update to items-database.json, not a
+  code change.
