@@ -1,53 +1,9 @@
 <!DOCTYPE html>
 <!--
-  DUSTRUNNER — CREW MANIFEST — CHANGELOG
-  (Kept here so future edits can pick up context without re-deriving history.)
-
-  v1 — Initial player-facing crew manifest tracker: tabs (All / per-character /
-       Sell), Log New Item form, plain-text Share Summary with copy-to-clipboard,
-       localStorage persistence.
-  v2 — Added Qty field to the log form. Items can be logged as stacks; displayed
-       value is unit value × quantity, name shows as "Item ×N" when N > 1.
-  v3 — Added Transfer: a button on every item row opens a modal to move an item
-       (or split part of a stack) to another character, the Sell pile, or a new
-       Unavailable status (lost / destroyed / given away). Added the Unavailable
-       tab.
-  v4 — Added "Download as .txt" for the Share Summary. Added Export Data /
-       Import Data (JSON) so the full manifest — not just the human-readable
-       summary — can be handed off between players or devices without losing
-       session-level detail.
-  v5 — Replaced localStorage with a live Firebase Firestore backend (project
-       "dustrunner-425bd", collection manifests/dustrunner/items). Everyone
-       who opens this page now sees the same data, updated in real time —
-       adds, deletes, and transfers from any device sync to all others
-       immediately. Export/Import Data now read and write the shared
-       collection instead of local storage. activeTab remains per-device
-       (not shared) since it's just which tab you're looking at.
-
-       NOTE: Firestore rules were created in test mode, which expires
-       2026-10-11 and locks out ALL access — including the app itself —
-       once it does. Real security rules (scoped to just the
-       manifests/dustrunner/items path) need to be written and pasted
-       into the Firebase console before that date.
-  v6 — Removed Export Data / Import Data. They existed to solve "the log
-       needs to survive a change of who's running it," which the live
-       Firestore backend (v5) already solves on its own. Share Summary
-       stays — it solves a different problem (a human-readable snapshot
-       to paste outside the app), not made obsolete by the backend.
-       Note: there is no undo for Clear All now that the backup export
-       is gone.
-  v7 — Clear All now opens a themed in-app confirm modal instead of the
-       browser's plain confirm() popup (same protection, matches the UI).
-       Share Summary reorganized to mirror the tabs in order: All, then
-       each character, then Sell, then a new Unavailable section (it was
-       missing from the summary before) — grand total stays at the end.
-       Increased font sizes and widened the device frame throughout;
-       brightened --dim and --tan-dim for better contrast against the
-       dark background.
-
-  Pending / ideas not yet built:
-  - Write and deploy real Firestore security rules before the test-mode
-    rules expire (see v5 note above).
+  DUSTRUNNER — CREW MANIFEST — v1.1
+  Version history now lives in CHANGELOG.md, not here. Still pending:
+  real Firestore security rules before the test-mode rules expire
+  2026-10-11 (see CHANGELOG.md v0.5 for context).
 -->
 <html lang="en">
 <head>
@@ -92,6 +48,16 @@ body{
   border-radius:8px;
   position:relative;
   overflow:hidden;
+}
+
+.version-tag{
+  position:absolute;
+  top:10px;
+  right:26px;
+  font-size:10px;
+  color:var(--tan-dim);
+  letter-spacing:.08em;
+  z-index:3;
 }
 
 /* Corner marks */
@@ -220,6 +186,7 @@ body{
 .item-name{ font-size:13px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .item-session{ font-size:11px; color:var(--dim); margin-top:2px; }
 .item-val{ font-size:13px; color:var(--text); text-align:right; white-space:nowrap; }
+.item-meta{ font-size:10px; color:var(--dim); margin-top:2px; white-space:nowrap; }
 .item-tag{
   font-size:11px; padding:2px 6px; border-radius:2px;
   border:1px solid var(--border); color:var(--dim);
@@ -290,7 +257,7 @@ body{
   margin-top:16px;
 }
 .add-title{ font-size:11px; color:var(--dim); letter-spacing:.1em; margin-bottom:12px; }
-.add-grid{ display:grid; grid-template-columns:1fr 80px 100px; gap:8px; margin-bottom:8px; }
+.add-grid4{ display:grid; grid-template-columns:70px 100px 70px 100px; gap:8px; margin-bottom:8px; }
 .add-grid2{ display:grid; grid-template-columns:1fr 1fr 90px; gap:8px; margin-bottom:10px; }
 .field-label{ font-size:10px; color:var(--dim); margin-bottom:3px; letter-spacing:.06em; }
 .field-input{
@@ -387,6 +354,7 @@ body{
 <body>
 
 <div class="device">
+<span class="version-tag">v1.1</span>
 <div class="device-foot">
 
   <!-- ── Banner ── -->
@@ -411,7 +379,10 @@ body{
       </div>
       <div class="meta-item" style="margin-left:auto">
         <span class="meta-label">&nbsp;</span>
-        <button class="btn-share" onclick="openShare()">Share Summary</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn-share" onclick="openSettings()">Settings</button>
+          <button class="btn-share" onclick="openShare()">Share Summary</button>
+        </div>
       </div>
     </div>
   </div>
@@ -422,17 +393,14 @@ body{
     <!-- Tabs -->
     <div class="tabs" id="tabs"></div>
 
-    <!-- Content -->
-    <div id="content"></div>
-
     <!-- Add form -->
     <div class="add-section">
       <div class="add-title">Log New Item</div>
-      <div class="add-grid">
-        <div>
-          <div class="field-label">Description</div>
-          <input class="field-input" id="fName" placeholder="Item name or description…" onkeydown="if(event.key==='Enter')addItem()">
-        </div>
+      <div style="margin-bottom:8px">
+        <div class="field-label">Description</div>
+        <input class="field-input" id="fName" placeholder="Item name or description…" onkeydown="if(event.key==='Enter')addItem()">
+      </div>
+      <div class="add-grid4">
         <div>
           <div class="field-label">Qty</div>
           <input class="field-input" id="fQty" type="number" min="1" placeholder="1" onkeydown="if(event.key==='Enter')addItem()">
@@ -441,18 +409,19 @@ body{
           <div class="field-label">Value (cr)</div>
           <input class="field-input" id="fValue" type="number" min="0" placeholder="0" onkeydown="if(event.key==='Enter')addItem()">
         </div>
+        <div>
+          <div class="field-label">Level</div>
+          <input class="field-input" id="fLevel" type="number" min="0" placeholder="—" onkeydown="if(event.key==='Enter')addItem()">
+        </div>
+        <div>
+          <div class="field-label">Bulk</div>
+          <input class="field-input" id="fBulk" type="text" placeholder="L, -, or #" onkeydown="if(event.key==='Enter')addItem()">
+        </div>
       </div>
       <div class="add-grid2">
         <div>
           <div class="field-label">Recipient</div>
-          <select class="field-select" id="fRecipient">
-            <option value="Crew">Crew (shared)</option>
-            <option value="Rast">Rast</option>
-            <option value="Grevakh">Grevakh</option>
-            <option value="Cael">Cael</option>
-            <option value="Lyra">Lyra</option>
-            <option value="Chungus">Chungus</option>
-          </select>
+          <select class="field-select" id="fRecipient"></select>
         </div>
         <div>
           <div class="field-label">Session</div>
@@ -472,8 +441,11 @@ body{
       </div>
     </div>
 
+    <!-- Content -->
+    <div id="content" style="margin-top:20px"></div>
+
   </div>
-</div><!-- device-foot -->
+  </div><!-- device-foot -->
 </div><!-- device -->
 
 <!-- Share modal -->
@@ -513,11 +485,32 @@ body{
   </div>
 </div>
 
+<!-- Settings modal -->
+<div class="modal-overlay" id="settingsModal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <div class="modal-title">Characters</div>
+    <div class="modal-body-text">Add or remove characters. Removing one doesn't touch any loot already logged to them — their items just stop having a dedicated tab and stay visible under All.</div>
+    <div id="charList" style="margin-bottom:16px"></div>
+    <div class="add-grid2" style="grid-template-columns:1fr 90px">
+      <div>
+        <div class="field-label">New character name</div>
+        <input class="field-input" id="newCharName" placeholder="Character name…" onkeydown="if(event.key==='Enter'){event.preventDefault();addCharacter();}">
+      </div>
+      <div style="display:flex;align-items:flex-end">
+        <button class="btn btn-primary" style="width:100%" onclick="addCharacter()">Add</button>
+      </div>
+    </div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn btn-ghost" onclick="closeSettings()">Close</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
-  onSnapshot, writeBatch, getDocs
+  onSnapshot, writeBatch, getDocs, setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ── Firebase — shared live data for everyone using this page ────────────────
@@ -532,13 +525,12 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
 const itemsCol = collection(db, 'manifests', 'dustrunner', 'items');
+const settingsDocRef = doc(db, 'manifests', 'dustrunner');
 
 // ── Data ────────────────────────────────────────────────────────────────────
-const CHARS = ['Rast','Grevakh','Cael','Lyra','Chungus'];
-const CHAR_COLORS = {
-  Rast:'#c0392b', Grevakh:'#d4a017', Cael:'#1abc9c',
-  Lyra:'#9b59b6', Chungus:'#e67e22', Crew:'#7a6645'
-};
+// The character roster is shared and live too — everyone who adds/removes
+// a character via Settings sees it change for everyone, instantly.
+let CHARS = [];
 
 // activeTab is per-device UI state only — not shared. Everything in
 // STATE.items comes from Firestore and is shared live with everyone.
@@ -552,10 +544,75 @@ onSnapshot(itemsCol, (snapshot) => {
   console.error('Manifest sync error:', err);
 });
 
+onSnapshot(settingsDocRef, (snap) => {
+  if(snap.exists() && Array.isArray(snap.data().characters)){
+    CHARS = snap.data().characters;
+  } else if(!snap.exists()){
+    // First time this project's been used — seed the default roster.
+    CHARS = ['Rast','Grevakh','Cael','Lyra','Chungus'];
+    setDoc(settingsDocRef, { characters: CHARS }, { merge: true }).catch(console.error);
+  }
+  renderRecipientOptions();
+  if(document.getElementById('settingsModal').classList.contains('open')) renderCharList();
+  refresh();
+}, (err) => {
+  console.error('Settings sync error:', err);
+});
+
 function setActiveTab(t){
   STATE.activeTab = t;
   localStorage.setItem('cw_activeTab', t);
   refresh();
+}
+
+// ── Recipient dropdown (Log New Item form) ───────────────────────────────────
+function renderRecipientOptions(){
+  const sel = document.getElementById('fRecipient');
+  const current = sel.value;
+  sel.innerHTML = '<option value="Crew">Crew (shared)</option>' +
+    CHARS.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  if([...sel.options].some(o => o.value === current)) sel.value = current;
+}
+
+// ── Settings (character roster) ──────────────────────────────────────────────
+function renderCharList(){
+  const el = document.getElementById('charList');
+  if(CHARS.length === 0){
+    el.innerHTML = '<div class="empty-msg">No characters yet — add one below.</div>';
+    return;
+  }
+  el.innerHTML = CHARS.map(c => `
+    <div class="sell-row">
+      <span class="sell-name">${esc(c)}</span>
+      <button class="del-btn" onclick="removeCharacter('${esc(c)}')" title="Remove">&times;</button>
+    </div>
+  `).join('');
+}
+
+function openSettings(){
+  renderCharList();
+  document.getElementById('settingsModal').classList.add('open');
+}
+
+function closeSettings(){
+  document.getElementById('settingsModal').classList.remove('open');
+}
+
+async function addCharacter(){
+  const input = document.getElementById('newCharName');
+  const name = input.value.trim();
+  if(!name) return;
+  if(CHARS.some(c => c.toLowerCase() === name.toLowerCase())){
+    alert(`${name} is already on the list.`);
+    return;
+  }
+  input.value = '';
+  await setDoc(settingsDocRef, { characters: [...CHARS, name] }, { merge: true });
+}
+
+async function removeCharacter(name){
+  if(!confirm(`Remove ${name}? Their existing logged items won't be deleted — they just won't have their own tab anymore.`)) return;
+  await setDoc(settingsDocRef, { characters: CHARS.filter(c => c !== name) }, { merge: true });
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
@@ -591,6 +648,39 @@ function displayName(item){
   return q > 1 ? `${item.name} ×${q}` : item.name;
 }
 
+// ── Bulk helpers ──────────────────────────────────────────────────────────────
+// Readable bulk values: "-" or "0" (no bulk), "L" (light — 0.1 Bulk, so 10 L
+// = 1 Bulk), or a whole number. Anything else is displayed as typed but
+// excluded from totals entirely.
+function parseBulk(raw){
+  if(raw === undefined || raw === null) return 0;
+  const v = String(raw).trim();
+  if(v === '') return 0;
+  if(v === '-' || v === '—' || v === '0') return 0;
+  if(v.toUpperCase() === 'L') return 0.1;
+  if(/^\d+$/.test(v)) return parseInt(v,10);
+  return null; // unreadable — ignored from totals
+}
+function bulkContribution(item){
+  const parsed = parseBulk(item.bulk);
+  return parsed === null ? 0 : parsed * itemQty(item);
+}
+function totalBulk(items){
+  return Math.floor(items.reduce((s,i)=>s+bulkContribution(i),0));
+}
+function bulkDisplay(item){
+  if(item.bulk === undefined || item.bulk === null) return null;
+  const v = String(item.bulk).trim();
+  return v === '' ? null : v;
+}
+function itemMetaText(item){
+  const parts = [];
+  if(item.level !== undefined && item.level !== null && item.level !== '') parts.push('Lvl '+item.level);
+  const bd = bulkDisplay(item);
+  if(bd !== null) parts.push(bd+' Bulk');
+  return parts.join(' · ');
+}
+
 // ── Render content ────────────────────────────────────────────────────────────
 function renderContent(){
   const tab = STATE.activeTab;
@@ -613,10 +703,11 @@ function renderContent(){
   });
 
   const total = items.reduce((s,i) => s + itemTotal(i), 0);
+  const bulk = totalBulk(items);
 
   let html = `<div class="section-hdr">
     <span class="section-title">${tab==='All'?'All Acquired Items':tab+' — Assigned Items'}</span>
-    <span class="section-total">${fmt(total)}</span>
+    <span class="section-total">${fmt(total)} <span style="color:var(--dim)">·</span> ${bulk} Bulk</span>
   </div>`;
 
   if(items.length===0){
@@ -627,6 +718,7 @@ function renderContent(){
   Object.entries(groups).forEach(([session, sitems]) => {
     html += `<div style="margin-bottom:3px;padding:5px 10px;background:var(--surface2);font-size:11px;color:var(--dim);letter-spacing:.1em">${session}</div>`;
     sitems.forEach(item => {
+      const meta = itemMetaText(item);
       html += `<div class="item-row">
         <div>
           <div class="item-name">${esc(displayName(item))}</div>
@@ -634,6 +726,7 @@ function renderContent(){
         </div>
         <div style="text-align:right">
           <div class="item-val">${fmt(itemTotal(item))}</div>
+          ${meta ? `<div class="item-meta">${esc(meta)}</div>` : ''}
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <span class="item-tag kept">Kept</span>
@@ -664,8 +757,10 @@ function renderSell(el){
 
   html += '<div class="sell-bucket">';
   items.forEach(item => {
+    const meta = itemMetaText(item);
     html += `<div class="sell-row">
       <span class="sell-name">${esc(displayName(item))}</span>
+      ${meta ? `<span class="item-meta" style="margin-right:10px">${esc(meta)}</span>` : ''}
       <span style="color:var(--dim);font-size:11px;margin-right:10px">${esc(item.session)}</span>
       <span class="sell-est">${fmt(itemTotal(item)*0.1)}</span>
       <button class="act-btn" style="margin-left:8px" onclick="openTransfer('${item.id}')">Transfer</button>
@@ -696,8 +791,10 @@ function renderUnavailable(el){
 
   html += '<div class="sell-bucket">';
   items.forEach(item => {
+    const meta = itemMetaText(item);
     html += `<div class="sell-row">
       <span class="sell-name">${esc(displayName(item))}</span>
+      ${meta ? `<span class="item-meta" style="margin-right:10px">${esc(meta)}</span>` : ''}
       <span style="color:var(--dim);font-size:11px;margin-right:10px">${esc(item.session)}</span>
       <span class="item-tag unavailable">Unavailable</span>
       <button class="act-btn" style="margin-left:8px" onclick="openTransfer('${item.id}')">Transfer</button>
@@ -715,6 +812,9 @@ async function addItem(){
   const qtyRaw    = document.getElementById('fQty').value;
   const qty       = qtyRaw.trim() === '' ? 1 : Math.max(1, parseInt(qtyRaw) || 1);
   const value     = parseFloat(document.getElementById('fValue').value)||0;
+  const levelRaw  = document.getElementById('fLevel').value;
+  const level     = levelRaw.trim() === '' ? null : Math.max(0, parseInt(levelRaw)||0);
+  const bulk      = document.getElementById('fBulk').value.trim();
   const recipient = document.getElementById('fRecipient').value;
   const session   = document.getElementById('fSession').value.trim()||'Session 1';
   const status    = document.getElementById('fStatus').value;
@@ -722,8 +822,10 @@ async function addItem(){
   document.getElementById('fName').value='';
   document.getElementById('fQty').value='';
   document.getElementById('fValue').value='';
+  document.getElementById('fLevel').value='';
+  document.getElementById('fBulk').value='';
   document.getElementById('fName').focus();
-  await addDoc(itemsCol, {name, qty, value, recipient, session, status});
+  await addDoc(itemsCol, {name, qty, value, level, bulk, recipient, session, status});
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
@@ -805,6 +907,8 @@ async function confirmTransfer(){
       name: item.name,
       qty: moveQty,
       value: item.value,
+      level: item.level ?? null,
+      bulk: item.bulk ?? '',
       recipient: newRecipient,
       session: item.session,
       status: newStatus,
@@ -959,6 +1063,7 @@ Object.assign(window, {
   addItem, deleteItem, clearAll, closeClearConfirm, doClearAll,
   openShare, closeShare, copyShare, downloadShareText,
   openTransfer, closeTransfer, confirmTransfer,
+  openSettings, closeSettings, addCharacter, removeCharacter,
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────────
