@@ -817,5 +817,516 @@
     "level": 20,
     "value": 320000,
     "bulk": "100"
+  },
+  {
+    "name": "Wraith-Sting Rifle, Yellow Jacket",
+    "family": "Weapon: Sniper",
+    "level": 1,
+    "value": 375,
+    "bulk": "1"
+  },
+  {
+    "name": "Philosopher's Sting, Lead",
+    "family": "Weapon: Sniper",
+    "level": 2,
+    "value": 950,
+    "bulk": "1"
+  },
+  {
+    "name": "Rift Rifle, Pinhole",
+    "family": "Weapon: Sniper",
+    "level": 4,
+    "value": 2180,
+    "bulk": "2"
+  },
+  {
+    "name": "Kin-Killer, Tactical",
+    "family": "Weapon: Sniper",
+    "level": 5,
+    "value": 3010,
+    "bulk": "2"
+  },
+  {
+    "name": "Wraith-Sting Rifle, Wasp",
+    "family": "Weapon: Sniper",
+    "level": 5,
+    "value": 2980,
+    "bulk": "1"
+  },
+  {
+    "name": "Philosopher's Sting, Iron",
+    "family": "Weapon: Sniper",
+    "level": 7,
+    "value": 6600,
+    "bulk": "1"
+  },
+  {
+    "name": "Rift Rifle, Keyhole",
+    "family": "Weapon: Sniper",
+    "level": 9,
+    "value": 14500,
+    "bulk": "2"
+  },
+  {
+    "name": "Nanite Rifle, Tactical",
+    "family": "Weapon: Sniper",
+    "level": 10,
+    "value": 20100,
+    "bulk": "1"
+  },
+  {
+    "name": "Kin-Killer, Advanced",
+    "family": "Weapon: Sniper",
+    "level": 11,
+    "value": 25100,
+    "bulk": "2"
+  },
+  {
+    "name": "Philosopher's Sting, Mercury",
+    "family": "Weapon: Sniper",
+    "level": 12,
+    "value": 36300,
+    "bulk": "1"
+  },
+  {
+    "name": "Rift Rifle, Borehole",
+    "family": "Weapon: Sniper",
+    "level": 14,
+    "value": 80000,
+    "bulk": "2"
+  },
+  {
+    "name": "Wraith-Sting Rifle, Hornet",
+    "family": "Weapon: Sniper",
+    "level": 14,
+    "value": 71200,
+    "bulk": "1"
+  },
+  {
+    "name": "Kin-Killer, Elite",
+    "family": "Weapon: Sniper",
+    "level": 15,
+    "value": 107100,
+    "bulk": "2"
+  },
+  {
+    "name": "Nanite Rifle, Advanced",
+    "family": "Weapon: Sniper",
+    "level": 15,
+    "value": 131000,
+    "bulk": "1"
+  },
+  {
+    "name": "Philosopher's Sting, Gold",
+    "family": "Weapon: Sniper",
+    "level": 17,
+    "value": 290000,
+    "bulk": "1"
+  },
+  {
+    "name": "Nanite Rifle, Elite",
+    "family": "Weapon: Sniper",
+    "level": 19,
+    "value": 648000,
+    "bulk": "1"
+  },
+  {
+    "name": "Rift Rifle, Wormhole",
+    "family": "Weapon: Sniper",
+    "level": 19,
+    "value": 600000,
+    "bulk": "2"
+  },
+  {
+    "name": "Kin-Killer, Paragon",
+    "family": "Weapon: Sniper",
+    "level": 20,
+    "value": 825000,
+    "bulk": "2"
+  },
+  {
+    "name": "Gamma Rifle, Terrestrial",
+    "family": "Weapon: Sniper",
+    "level": 4,
+    "value": 2120,
+    "bulk": "1"
+  },
+  {
+    "name": "Gamma Rifle, Ionizing",
+    "family": "Weapon: Sniper",
+    "level": 9,
+    "value": 13600,
+    "bulk": "1"
+  },
+  {
+    "name": "Gamma Rifle, Fusion",
+    "family": "Weapon: Sniper",
+    "level": 12,
+    "value": 36600,
+    "bulk": "1"
+  },
+  {
+    "name": "Gamma Rifle, Synchrotron",
+    "family": "Weapon: Sniper",
+    "level": 17,
+    "value": 272000,
+    "bulk": "1"
+  },
+  {
+    "name": "Diasporan Rifle, Tactical",
+    "family": "Weapon: Sniper",
+    "level": 1,
+    "value": 350,
+    "bulk": "1"
+  },
+  {
+    "name": "Focus Rifle, Dual",
+    "family": "Weapon: Sniper",
+    "level": 3,
+    "value": 1400,
+    "bulk": "1"
+  },
+  {
+    "name": "Diasporan Rifle, Advanced",
+    "family": "Weapon: Sniper",
+    "level": 5,
+    "value": 3750,
+    "bulk": "2"
+  },
+  {
+    "name": "Focus Rifle, Triple",
+    "family": "Weapon: Sniper",
+    "level": 7,
+    "value": 6460,
+    "bulk": "1"
+  },
+  {
+    "name": "Diasporan Rifle, Elite",
+    "family": "Weapon: Sniper",
+    "level": 10,
+    "value": 17000,
+    "bulk": "2"
+  },
+  {
+    "name": "Focus Rifle, Quad",
+    "family": "Weapon: Sniper",
+    "level": 13,
+    "value": 50800,
+    "bulk": "1"
+  },
+  {
+    "name": "Diasporan Rifle, Ultra",
+    "family": "Weapon: Sniper",
+    "level": 15,
+    "value": 110000,
+    "bulk": "2"
+  },
+  {
+    "name": "Focus Rifle, Compound",
+    "family": "Weapon: Sniper",
+    "level": 18,
+    "value": 375000,
+    "bulk": "1"
+  },
+  {
+    "name": "Diasporan Rifle, Imperial",
+    "family": "Weapon: Sniper",
+    "level": 20,
+    "value": 725000,
+    "bulk": "2"
+  },
+  {
+    "name": "Plasma Guide, Series-21",
+    "family": "Weapon: Sniper",
+    "level": 2,
+    "value": 1070,
+    "bulk": "2"
+  },
+  {
+    "name": "Plasma Guide, Series-28",
+    "family": "Weapon: Sniper",
+    "level": 6,
+    "value": 4920,
+    "bulk": "2"
+  },
+  {
+    "name": "Plasma Guide, Series-37",
+    "family": "Weapon: Sniper",
+    "level": 8,
+    "value": 10800,
+    "bulk": "2"
+  },
+  {
+    "name": "Plasma Guide, Series-42",
+    "family": "Weapon: Sniper",
+    "level": 11,
+    "value": 28200,
+    "bulk": "2"
+  },
+  {
+    "name": "Plasma Guide, Series-62",
+    "family": "Weapon: Sniper",
+    "level": 16,
+    "value": 193000,
+    "bulk": "2"
+  },
+  {
+    "name": "Plasma Guide, Series-73",
+    "family": "Weapon: Sniper",
+    "level": 20,
+    "value": 980000,
+    "bulk": "2"
+  },
+  {
+    "name": "Coil Rifle, Precision",
+    "family": "Weapon: Sniper",
+    "level": 1,
+    "value": 390,
+    "bulk": "2"
+  },
+  {
+    "name": "Shobhad Horizon Striker, Tactical",
+    "family": "Weapon: Sniper",
+    "level": 1,
+    "value": 440,
+    "bulk": "2"
+  },
+  {
+    "name": "Tagtech Rifle, Dazzler",
+    "family": "Weapon: Sniper",
+    "level": 1,
+    "value": 400,
+    "bulk": "1"
+  },
+  {
+    "name": "Shirren-Eye Rifle, Tactical",
+    "family": "Weapon: Sniper",
+    "level": 2,
+    "value": 755,
+    "bulk": "1"
+  },
+  {
+    "name": "Assassin Rifle, Stalker",
+    "family": "Weapon: Sniper",
+    "level": 3,
+    "value": 1510,
+    "bulk": "1"
+  },
+  {
+    "name": "Extrusion Rifle, 12-atm",
+    "family": "Weapon: Sniper",
+    "level": 3,
+    "value": 1470,
+    "bulk": "2"
+  },
+  {
+    "name": "Multistage Rifle, Dual",
+    "family": "Weapon: Sniper",
+    "level": 4,
+    "value": 2380,
+    "bulk": "2"
+  },
+  {
+    "name": "Parapet Rifle, Tactical",
+    "family": "Weapon: Sniper",
+    "level": 4,
+    "value": 2350,
+    "bulk": "2"
+  },
+  {
+    "name": "Coil Rifle, Specialist",
+    "family": "Weapon: Sniper",
+    "level": 5,
+    "value": 3120,
+    "bulk": "2"
+  },
+  {
+    "name": "Tagtech Rifle, Vivifier",
+    "family": "Weapon: Sniper",
+    "level": 5,
+    "value": 3180,
+    "bulk": "1"
+  },
+  {
+    "name": "Assassin Rifle, Shadow",
+    "family": "Weapon: Sniper",
+    "level": 6,
+    "value": 4550,
+    "bulk": "1"
+  },
+  {
+    "name": "Shobhad Horizon Striker, Advanced",
+    "family": "Weapon: Sniper",
+    "level": 6,
+    "value": 4750,
+    "bulk": "2"
+  },
+  {
+    "name": "Multistage Rifle, Dual-Plus",
+    "family": "Weapon: Sniper",
+    "level": 7,
+    "value": 7500,
+    "bulk": "2"
+  },
+  {
+    "name": "Extrusion Rifle, 24-atm",
+    "family": "Weapon: Sniper",
+    "level": 8,
+    "value": 9840,
+    "bulk": "2"
+  },
+  {
+    "name": "Shirren-Eye Rifle, Advanced",
+    "family": "Weapon: Sniper",
+    "level": 8,
+    "value": 9350,
+    "bulk": "2"
+  },
+  {
+    "name": "Assassin Rifle, Phantom",
+    "family": "Weapon: Sniper",
+    "level": 9,
+    "value": 14900,
+    "bulk": "1"
+  },
+  {
+    "name": "Parapet Rifle, Advanced",
+    "family": "Weapon: Sniper",
+    "level": 9,
+    "value": 14600,
+    "bulk": "2"
+  },
+  {
+    "name": "Coil Rifle, Rangefinder",
+    "family": "Weapon: Sniper",
+    "level": 10,
+    "value": 18600,
+    "bulk": "2"
+  },
+  {
+    "name": "Multistage Rifle, Triple",
+    "family": "Weapon: Sniper",
+    "level": 11,
+    "value": 27900,
+    "bulk": "2"
+  },
+  {
+    "name": "Shobhad Horizon Striker, Elite",
+    "family": "Weapon: Sniper",
+    "level": 11,
+    "value": 27300,
+    "bulk": "2"
+  },
+  {
+    "name": "Tagtech Rifle, Coruscator",
+    "family": "Weapon: Sniper",
+    "level": 11,
+    "value": 25750,
+    "bulk": "1"
+  },
+  {
+    "name": "Assassin Rifle, Spectre",
+    "family": "Weapon: Sniper",
+    "level": 12,
+    "value": 29500,
+    "bulk": "1"
+  },
+  {
+    "name": "Extrusion Rifle, 48-atm",
+    "family": "Weapon: Sniper",
+    "level": 13,
+    "value": 55000,
+    "bulk": "2"
+  },
+  {
+    "name": "Shirren-Eye Rifle, Elite",
+    "family": "Weapon: Sniper",
+    "level": 13,
+    "value": 54000,
+    "bulk": "2"
+  },
+  {
+    "name": "Coil Rifle, Saboteur",
+    "family": "Weapon: Sniper",
+    "level": 14,
+    "value": 76700,
+    "bulk": "2"
+  },
+  {
+    "name": "Parapet Rifle, Elite",
+    "family": "Weapon: Sniper",
+    "level": 14,
+    "value": 78800,
+    "bulk": "2"
+  },
+  {
+    "name": "Multistage Rifle, Triple-Plus",
+    "family": "Weapon: Sniper",
+    "level": 15,
+    "value": 124000,
+    "bulk": "2"
+  },
+  {
+    "name": "Shirren-Eye Rifle, Paragon",
+    "family": "Weapon: Sniper",
+    "level": 16,
+    "value": 147200,
+    "bulk": "1"
+  },
+  {
+    "name": "Shobhad Horizon Striker, Paragon",
+    "family": "Weapon: Sniper",
+    "level": 16,
+    "value": 185000,
+    "bulk": "2"
+  },
+  {
+    "name": "Assassin Rifle, Wraith",
+    "family": "Weapon: Sniper",
+    "level": 17,
+    "value": 278000,
+    "bulk": "1"
+  },
+  {
+    "name": "Tagtech Rifle, Nova",
+    "family": "Weapon: Sniper",
+    "level": 17,
+    "value": 265000,
+    "bulk": "1"
+  },
+  {
+    "name": "Extrusion Rifle, 96-atm",
+    "family": "Weapon: Sniper",
+    "level": 18,
+    "value": 392400,
+    "bulk": "2"
+  },
+  {
+    "name": "Multistage Rifle, Quad",
+    "family": "Weapon: Sniper",
+    "level": 18,
+    "value": 627000,
+    "bulk": "2"
+  },
+  {
+    "name": "Coil Rifle, Assassin",
+    "family": "Weapon: Sniper",
+    "level": 19,
+    "value": 590000,
+    "bulk": "2"
+  },
+  {
+    "name": "Parapet Rifle, Paragon",
+    "family": "Weapon: Sniper",
+    "level": 19,
+    "value": 610000,
+    "bulk": "2"
+  },
+  {
+    "name": "Shirren-Eye Rifle, Warpshot",
+    "family": "Weapon: Sniper",
+    "level": 20,
+    "value": 740800,
+    "bulk": "1"
   }
 ]
